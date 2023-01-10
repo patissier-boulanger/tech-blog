@@ -32,7 +32,7 @@ module.exports = {
         serif: ['Nanum Myeongjo', 'serif'],
       },
       colors: {
-        primary: colors.teal,
+        primary: colors.pink,
         primaryVariant: {
           light: '#3700B3',
           DEFAULT: '#3700B3',
