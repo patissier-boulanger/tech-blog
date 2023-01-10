@@ -33,6 +33,46 @@ module.exports = {
       },
       colors: {
         primary: colors.teal,
+        primaryVariant: {
+          light: '#3700B3',
+          DEFAULT: '#3700B3',
+          dark: '#3700B3',
+        },
+        secondary: {
+          light: '#03DAC6',
+          DEFAULT: '#03DAC6',
+          dark: '#03DAC6',
+        },
+        backsheet: {
+          light: '#E5E5E5',
+          DEFAULT: '#2A2A2A',
+          dark: '#2A2A2A',
+        },
+        background: {
+          light: '#FFFFFF',
+          DEFAULT: '#121212',
+          dark: '#121212',
+        },
+        surface: {
+          light: '#FFFFFF',
+          DEFAULT: '#121212',
+          dark: '#121212',
+        },
+        onBackground: {
+          light: '#121212',
+          DEFAULT: '#FFFFFF',
+          dark: '#FFFFFF',
+        },
+        onSurface: {
+          light: '#121212',
+          DEFAULT: '#FFFFFF',
+          dark: '#FFFFFF',
+        },
+        error: {
+          light: '#B00020',
+          DEFAULT: '#CF6679',
+          dark: '#CF6679',
+        },
         //@ts-ignore
         gray: colors.neutral, // TODO: Remove ts-ignore after tw types gets updated to v3
       },
