@@ -88,7 +88,7 @@ export default function Home({ posts }: InferGetStaticPropsType<typeof getStatic
             className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
             aria-label="all posts"
           >
-            All Posts &rarr;
+            더 보기
           </Link>
         </div>
       )}
