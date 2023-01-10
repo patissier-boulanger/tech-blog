@@ -1,3 +1,4 @@
+import { IntroVideo } from '@/components/IntroVideo'
 import Link from '@/components/Link'
 import { PageSEO } from '@/components/SEO'
 import Tag from '@/components/Tag'
@@ -19,8 +20,8 @@ export default function Home({ posts }: InferGetStaticPropsType<typeof getStatic
   return (
     <>
       <PageSEO title={siteMetadata.title} description={siteMetadata.description} />
+      <IntroVideo />
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
-        <div className="min-h-[200px] flex-1 bg-red-500">Loop video should be here</div>
         <div className="space-y-2 pt-6 pb-8 md:space-y-5">
           <h1 className="font-sans text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
             최신 글
