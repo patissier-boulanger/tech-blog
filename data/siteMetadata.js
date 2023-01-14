@@ -4,7 +4,7 @@ const siteMetadata = {
   headerTitle: 'TailwindBlog',
   description: '프론트엔드 개발자 정주형의 블로그입니다. -개발중',
   language: 'ko-kr',
-  theme: 'system', // system, dark or light
+  theme: 'light', // system, dark or light
   siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
   siteRepo: 'https://github.com/timlrx/tailwind-nextjs-starter-blog',
   siteLogo: '/static/images/logo.png',
