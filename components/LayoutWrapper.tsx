@@ -1,11 +1,14 @@
-import siteMetadata from '@/data/siteMetadata'
+import { ReactNode } from 'react'
+
+import siteMetadata, { github } from '@/data/siteMetadata'
 import headerNavLinks from '@/data/headerNavLinks'
+
 import Link from './Link'
 import SectionContainer from './SectionContainer'
 import Footer from './Footer'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
-import { ReactNode } from 'react'
+import { Icon } from './icon'
 
 interface Props {
   children: ReactNode
@@ -24,17 +27,28 @@ const LayoutWrapper = ({ children }: Props) => {
             </Link>
           </div>
           <div className="flex items-center text-base leading-5">
-            <div className="hidden sm:block">
-              {headerNavLinks.map((link) => (
-                <Link
-                  key={link.title}
-                  href={link.href}
-                  className="p-1 font-medium text-gray-900 dark:text-gray-100 sm:p-4"
-                >
-                  {link.title}
-                </Link>
-              ))}
-            </div>
+            <Link key={'Blog'} href={'/blog'} className="text-gray-900 dark:text-gray-100 sm:p-4">
+              <Icon kind="blog" size={16} />
+            </Link>
+            <Link key={'Blog'} href={'/blog'} className="text-gray-900 dark:text-gray-100 sm:p-4">
+              <Icon kind="me" size={20} />
+            </Link>
+            <a
+              className="text-gray-900 dark:text-gray-100 sm:p-4"
+              target="_blank"
+              rel="noopener noreferrer"
+              href={'https://www.naver.com'}
+            >
+              <Icon kind="github" size={20} />
+            </a>
+            <a
+              className="text-gray-900 dark:text-gray-100 sm:p-4"
+              target="_blank"
+              rel="noopener noreferrer"
+              href={'https://www.naver.com'}
+            >
+              <Icon kind="medium" size={20} />
+            </a>
             <ThemeSwitch />
             <MobileNav />
           </div>
