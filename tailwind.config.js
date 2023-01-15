@@ -34,9 +34,9 @@ module.exports = {
       colors: {
         primary: colors.pink,
         primaryVariant: {
-          light: '#3700B3',
-          DEFAULT: '#3700B3',
-          dark: '#3700B3',
+          light: '#EC407A',
+          DEFAULT: '#C97D7D',
+          dark: '#C97D7D',
         },
         secondary: {
           light: '#03DAC6',
@@ -209,5 +209,9 @@ module.exports = {
       }),
     },
   },
-  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/line-clamp'),
+  ],
 }

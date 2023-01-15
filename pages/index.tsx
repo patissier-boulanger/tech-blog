@@ -1,16 +1,10 @@
+import { IntroArticleLists } from '@/components/article'
 import { IntroVideo } from '@/components/IntroVideo'
-import Link from '@/components/Link'
 import { PageSEO } from '@/components/SEO'
-import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
 import { getAllFilesFrontMatter } from '@/lib/mdx'
-import formatDate from '@/lib/utils/formatDate'
 import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { PostFrontMatter } from 'types/PostFrontMatter'
-
-import Image from 'next/image'
-
-const MAX_DISPLAY = 5
 
 export const getStaticProps: GetStaticProps<{ posts: PostFrontMatter[] }> = async () => {
   const posts = await getAllFilesFrontMatter('blog')
@@ -23,70 +17,19 @@ export default function Home({ posts }: InferGetStaticPropsType<typeof getStatic
     <>
       <PageSEO title={siteMetadata.title} description={siteMetadata.description} />
       <IntroVideo />
+      <div className="mt-7 flex items-center">
+        <h2 className="mr-2 pb-4 font-sans text-5xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
+          Articles
+        </h2>
+        <div className="h-0.5 flex-1 bg-gray-300"></div>
+      </div>
+      {/* <p className="font-regular mb-7 font-sans text-base text-primaryVariant-light dark:text-gray-100">
+        웹 혹은 모바일 개발에 대한 글을 씁니다.
+        <br />
+        가끔은 다른 주제에 대해 이야기합니다
+      </p> */}
 
-      <h2 className="mb-7 font-sans text-5xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
-        최신 글
-      </h2>
-      <ul className="divide-y divide-onSurface-light dark:divide-gray-700">
-        {!posts.length && 'No posts found.'}
-        {posts.slice(0, MAX_DISPLAY).map((frontMatter) => {
-          const { slug, date, title, summary, tags } = frontMatter
-          return (
-            <li key={slug} className="py-12">
-              <article>
-                <div className="space-y-2 xl:grid xl:grid-cols-4 xl:items-baseline xl:space-y-0">
-                  <dl>
-                    <dt className="sr-only">Published on</dt>
-                    <dd className="text-base font-medium leading-6 text-gray-500 dark:text-gray-400">
-                      <time dateTime={date}>{formatDate(date)}</time>
-                    </dd>
-                  </dl>
-                  <div className="space-y-5 xl:col-span-3">
-                    <div className="space-y-6">
-                      <div>
-                        <h2 className="font-serif text-3xl font-black leading-10 tracking-tight">
-                          <Link href={`/blog/${slug}`} className="text-gray-900 dark:text-gray-100">
-                            {title} 한글한글 아름답게 컴포넌트를 아름답게 쓰고 있나요?
-                          </Link>
-                        </h2>
-                        <div className="flex flex-wrap">
-                          {tags.map((tag) => (
-                            <Tag key={tag} text={tag} />
-                          ))}
-                        </div>
-                      </div>
-                      <div className="prose max-w-none text-gray-500 dark:text-gray-400">
-                        {summary}
-                      </div>
-                    </div>
-                    <div className="text-base font-medium leading-6">
-                      <Link
-                        href={`/blog/${slug}`}
-                        className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
-                        aria-label={`Read "${title}"`}
-                      >
-                        Read more &rarr;
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            </li>
-          )
-        })}
-      </ul>
-
-      {posts.length > MAX_DISPLAY && (
-        <div className="flex justify-end text-base font-medium leading-6">
-          <Link
-            href="/blog"
-            className="text-primaryVariant-light hover:text-primary-600 dark:text-primaryVariant-dark dark:hover:text-primary-400"
-            aria-label="all posts"
-          >
-            더 보기
-          </Link>
-        </div>
-      )}
+      <IntroArticleLists posts={posts} />
     </>
   )
 }

@@ -30,7 +30,7 @@ const LayoutWrapper = ({ children }: Props) => {
             <Link key={'Blog'} href={'/blog'} className="text-gray-900 dark:text-gray-100 sm:p-4">
               <Icon kind="blog" size={16} />
             </Link>
-            <Link key={'Blog'} href={'/blog'} className="text-gray-900 dark:text-gray-100 sm:p-4">
+            <Link key={'About'} href={'/about'} className="text-gray-900 dark:text-gray-100 sm:p-4">
               <Icon kind="me" size={20} />
             </Link>
             <a
