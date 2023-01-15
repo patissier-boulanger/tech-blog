@@ -1,5 +1,5 @@
 const siteMetadata = {
-  title: '개발중 블로그',
+  title: '블로그',
   author: '정주형',
   headerTitle: 'TailwindBlog',
   description: '프론트엔드 개발자 정주형의 블로그입니다. -개발중',

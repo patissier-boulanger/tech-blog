@@ -3,8 +3,6 @@ import formatDate from '@/lib/utils/formatDate'
 import Tag from '@/components/Tag'
 import { PostFrontMatter } from 'types/PostFrontMatter'
 
-const MAX_DISPLAY = 7
-
 type IntroArticleListsProp = {
   posts: PostFrontMatter[]
 }
@@ -15,7 +13,7 @@ export function IntroArticleLists({ posts }: IntroArticleListsProp) {
       <ul>
         {!posts.length && 'No posts found.'}
         <div className="xl:grid xl:auto-rows-auto xl:grid-cols-2 xl:items-baseline xl:gap-8 xl:gap-y-6 xl:space-y-0">
-          {posts.slice(0, MAX_DISPLAY).map((frontMatter) => {
+          {posts.slice().map((frontMatter) => {
             const { slug, date, title, summary, tags } = frontMatter
             return (
               <li key={slug} className="flex h-full w-full flex-col py-12">
@@ -50,17 +48,6 @@ export function IntroArticleLists({ posts }: IntroArticleListsProp) {
           })}
         </div>
       </ul>
-      {posts.length > MAX_DISPLAY && (
-        <div className="flex justify-end text-base font-medium leading-6">
-          <Link
-            href="/blog"
-            className="text-primaryVariant-light hover:text-primary-600 dark:text-primaryVariant-dark dark:hover:text-primary-400"
-            aria-label="all posts"
-          >
-            더 보기
-          </Link>
-        </div>
-      )}
     </>
   )
 }

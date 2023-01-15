@@ -1,7 +1,6 @@
 import { ReactNode } from 'react'
 
-import siteMetadata, { github } from '@/data/siteMetadata'
-import headerNavLinks from '@/data/headerNavLinks'
+import siteMetadata from '@/data/siteMetadata'
 
 import Link from './Link'
 import SectionContainer from './SectionContainer'
