@@ -23,12 +23,6 @@ export default function Home({ posts }: InferGetStaticPropsType<typeof getStatic
         </h2>
         <div className="h-0.5 flex-1 bg-gray-300"></div>
       </div>
-      {/* <p className="font-regular mb-7 font-sans text-base text-primaryVariant-light dark:text-gray-100">
-        웹 혹은 모바일 개발에 대한 글을 씁니다.
-        <br />
-        가끔은 다른 주제에 대해 이야기합니다
-      </p> */}
-
       <IntroArticleLists posts={posts} />
     </>
   )

@@ -27,12 +27,12 @@ export function IntroArticleLists({ posts }: IntroArticleListsProp) {
                   <div className="space-y-5">
                     <div>
                       <h2 className="min-h-[3rem] font-serif text-3xl font-black leading-10 tracking-tight line-clamp-2">
-                        <Link href={`/blog/${slug}`} className="text-gray-900 dark:text-gray-100">
+                        <Link href={`/blog/${slug}`} className="text-gray-800 dark:text-gray-100">
                           {title}
                         </Link>
                       </h2>
                     </div>
-                    <div className="prose max-w-none font-serif text-gray-800 line-clamp-4 dark:text-gray-700 ">
+                    <div className="prose max-w-none font-serif text-gray-800 line-clamp-4 dark:text-gray-300 ">
                       {summary}
                     </div>
                   </div>
