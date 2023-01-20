@@ -1,8 +1,8 @@
 const siteMetadata = {
-  title: '블로그',
+  title: '정주형의 블로그입니다',
   author: '정주형',
-  headerTitle: 'TailwindBlog',
-  description: '프론트엔드 개발자 정주형의 블로그입니다. -개발중',
+  headerTitle: 'JJh Blog',
+  description: '프론트엔드 개발자 정주형의 블로그입니다',
   language: 'ko-kr',
   theme: 'light', // system, dark or light
   siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
