@@ -29,10 +29,6 @@ class MyDocument extends Document {
             href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&family=Noto+Serif+KR:wght@200;300;400;500;600;700;900&display=swap"
             rel="stylesheet"
           />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap"
-            rel="stylesheet"
-          />
         </Head>
         <body className="bg-backsheet-light text-black antialiased dark:bg-backsheet-dark dark:text-white">
           <Main />

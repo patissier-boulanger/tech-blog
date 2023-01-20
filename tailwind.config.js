@@ -29,7 +29,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Noto Sans KR', 'sans'],
-        serif: ['Nanum Myeongjo', 'serif'],
+        serif: ['Noto Serif KR', 'serif'],
       },
       colors: {
         primary: colors.pink,
@@ -79,7 +79,8 @@ module.exports = {
       typography: (theme) => ({
         DEFAULT: {
           css: {
-            color: theme('colors.gray.700'),
+            fontFamily: 'Noto Serif KR, serif',
+            color: theme('colors.gray.900'),
             a: {
               color: theme('colors.primary.500'),
               '&:hover': {
@@ -88,20 +89,24 @@ module.exports = {
               code: { color: theme('colors.primary.400') },
             },
             h1: {
+              fontFamily: 'Noto Sans KR, sans',
               fontWeight: '700',
               letterSpacing: theme('letterSpacing.tight'),
               color: theme('colors.gray.900'),
             },
             h2: {
+              fontFamily: 'Noto Sans KR, sans',
               fontWeight: '700',
               letterSpacing: theme('letterSpacing.tight'),
               color: theme('colors.gray.900'),
             },
             h3: {
+              fontFamily: 'Noto Sans KR, sans',
               fontWeight: '600',
               color: theme('colors.gray.900'),
             },
             'h4,h5,h6': {
+              fontFamily: 'Noto Sans KR, sans',
               color: theme('colors.gray.900'),
             },
             pre: {
@@ -146,6 +151,7 @@ module.exports = {
           },
         },
         dark: {
+          fontFamily: 'Noto Serif KR, serif',
           css: {
             color: theme('colors.gray.300'),
             a: {
@@ -156,20 +162,24 @@ module.exports = {
               code: { color: theme('colors.primary.400') },
             },
             h1: {
+              fontFamily: 'Noto Sans KR, sans',
               fontWeight: '700',
               letterSpacing: theme('letterSpacing.tight'),
               color: theme('colors.gray.100'),
             },
             h2: {
+              fontFamily: 'Noto Sans KR, sans',
               fontWeight: '700',
               letterSpacing: theme('letterSpacing.tight'),
               color: theme('colors.gray.100'),
             },
             h3: {
+              fontFamily: 'Noto Sans KR, sans',
               fontWeight: '600',
               color: theme('colors.gray.100'),
             },
             'h4,h5,h6': {
+              fontFamily: 'Noto Sans KR, sans',
               color: theme('colors.gray.100'),
             },
             pre: {
