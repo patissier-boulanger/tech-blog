@@ -13,6 +13,8 @@ export default function Footer() {
           <div>{siteMetadata.author}</div>
           <div>{` • `}</div>
           <div>{`© ${new Date().getFullYear()}`}</div>
+          <div>{` • `}</div>
+          <div>Copyright by Juhyoung JUNG. All rights reserved.</div>
         </div>
       </div>
     </footer>
