@@ -10,14 +10,10 @@ export function IntroVideo() {
     setMounted(true)
   }, [])
 
-  if (!mounted) {
-    return null
-  }
-
   return (
     <div className="min-h-[200px] flex-1">
       <div className="relative m-auto h-[600px] w-[600px]">
-        {mounted && (
+        {mounted ? (
           <video
             className="absolute object-contain"
             src={
@@ -31,6 +27,8 @@ export function IntroVideo() {
             controls={false}
             preload="auto"
           ></video>
+        ) : (
+          <></>
         )}
       </div>
     </div>

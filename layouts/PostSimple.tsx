@@ -3,7 +3,6 @@ import { BlogSEO } from '@/components/SEO'
 import siteMetadata from '@/data/siteMetadata'
 import formatDate from '@/lib/utils/formatDate'
 
-import ScrollTopAndComment from '@/components/ScrollTopAndComment'
 import { ReactNode } from 'react'
 import { PostFrontMatter } from 'types/PostFrontMatter'
 import PostLayoutSectionContainer from '@/components/PostLayoutSectionContainer'
@@ -21,7 +20,6 @@ export default function PostLayout({ frontMatter, children }: Props) {
   return (
     <PostLayoutSectionContainer>
       <BlogSEO url={`${siteMetadata.siteUrl}/blog/${slug}`} {...frontMatter} />
-      <ScrollTopAndComment />
       <article>
         <div>
           <header>

@@ -56,6 +56,9 @@ const securityHeaders = [
  * @type {import('next/dist/next-server/server/config').NextConfig}
  **/
 module.exports = withBundleAnalyzer({
+  experimental: {
+    scrollRestoration: true,
+  },
   reactStrictMode: true,
   images: {
     domains: ['picsum.photos'],
