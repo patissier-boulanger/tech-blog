@@ -24,11 +24,20 @@ export default function PostLayout({ frontMatter, children }: Props) {
         <div>
           <header>
             <div className="space-y-1 border-b border-gray-200 pb-10 text-left dark:border-gray-700">
-              <dl>
+              <dl className="mb-8">
                 <div>
                   <dt className="sr-only">Published on</dt>
                   <dd className="text-base font-medium leading-6 text-gray-500 dark:text-gray-400">
                     <time dateTime={date}>{formatDate(date)}</time>
+                    <address>
+                      <a
+                        rel="author noreferrer"
+                        href="https://mail.google.com/mail/?view=cm&fs=1&to=juhyoung.jung1992@gmail.com"
+                        target="_blank"
+                      >
+                        written By juhyoung.jung1992@gmail.com
+                      </a>
+                    </address>
                   </dd>
                 </div>
               </dl>
