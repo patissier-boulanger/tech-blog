@@ -5,7 +5,6 @@ import siteMetadata from '@/data/siteMetadata'
 import Link from './Link'
 import SectionContainer from './SectionContainer'
 import Footer from './Footer'
-import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import { Icon } from './icon'
 
@@ -21,11 +20,11 @@ const LayoutWrapper = ({ children }: Props) => {
   return (
     <SectionContainer>
       <div className="flex h-screen flex-col justify-between">
-        <header className="flex items-center justify-between py-10">
+        <header className="flex flex-col justify-between py-10 sm:flex-row sm:items-center">
           <div>
             <Link href="/" aria-label={siteMetadata.headerTitle}>
               <div className="flex flex-col items-start justify-between">
-                <div className="mr-3 font-serif text-base font-bold text-gray-800">
+                <div className="mr-3 font-serif text-base font-bold text-gray-800 dark:text-gray-400">
                   정주형의 블로그
                 </div>
                 <address>
@@ -41,7 +40,7 @@ const LayoutWrapper = ({ children }: Props) => {
               </div>
             </Link>
           </div>
-          <div className="flex items-center text-base leading-5">
+          <div className="flex items-center space-x-4 text-base leading-5 sm:space-x-0">
             {/* <Link key={'Blog'} href={'/blog'} className="text-gray-900 dark:text-gray-100 sm:p-4">
               <Icon kind="blog" size={16} />
             </Link>
@@ -73,7 +72,7 @@ const LayoutWrapper = ({ children }: Props) => {
               <Icon kind="medium" size={20} />
             </a>
             <ThemeSwitch />
-            <MobileNav />
+            {/* <MobileNav /> */}
           </div>
         </header>
         <main className="mb-auto">{children}</main>
