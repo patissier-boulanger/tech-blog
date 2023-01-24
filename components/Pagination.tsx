@@ -1,4 +1,5 @@
 import Link from '@/components/Link'
+import { Icon } from './icon'
 
 interface Props {
   totalPages: number
@@ -10,29 +11,29 @@ export default function Pagination({ totalPages, currentPage }: Props) {
   const nextPage = currentPage + 1 <= totalPages
 
   return (
-    <div className="space-y-2 pt-6 pb-8 md:space-y-5">
+    <div className="m-auto w-2/5 space-y-2 pt-10 pb-8 md:space-y-5">
       <nav className="flex justify-between">
         {!prevPage && (
-          <button className="cursor-auto disabled:opacity-50" disabled={!prevPage}>
-            Previous
+          <button className="cursor-auto disabled:opacity-30" disabled={!prevPage}>
+            <Icon kind="arrowLeft" size={20} />
           </button>
         )}
         {prevPage && (
           <Link href={currentPage - 1 === 1 ? `/blog/` : `/blog/page/${currentPage - 1}`}>
-            <button>Previous</button>
+            <Icon kind="arrowLeft" size={20} />
           </Link>
         )}
-        <span>
+        <span className="text-gray-700">
           {currentPage} of {totalPages}
         </span>
         {!nextPage && (
           <button className="cursor-auto disabled:opacity-50" disabled={!nextPage}>
-            Next
+            <Icon kind="arrowRight" size={20} />
           </button>
         )}
         {nextPage && (
-          <Link href={`/blog/page/${currentPage + 1}`}>
-            <button>Next</button>
+          <Link className="text-gray-700" href={`/blog/page/${currentPage + 1}`}>
+            <Icon kind="arrowRight" size={20} />
           </Link>
         )}
       </nav>
