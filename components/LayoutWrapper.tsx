@@ -28,16 +28,9 @@ const LayoutWrapper = ({ children }: Props) => {
                   <div className="mr-3 font-serif text-base font-bold text-gray-800 dark:text-gray-400">
                     정주형의 블로그
                   </div>
-                  <address>
-                    <a
-                      className="font-serif text-gray-500 dark:text-gray-400"
-                      rel="author noreferrer"
-                      href="https://mail.google.com/mail/?view=cm&fs=1&to=juhyoung.jung1992@gmail.com"
-                      target="_blank"
-                    >
-                      Write Dev Articles
-                    </a>
-                  </address>
+                  <div className="font-serif text-gray-500 dark:text-gray-400">
+                    Write Dev Articles
+                  </div>
                 </div>
                 <div className="self-center sm:hidden">
                   <ThemeSwitch />
