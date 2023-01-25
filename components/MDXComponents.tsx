@@ -1,5 +1,6 @@
 /* eslint-disable react/display-name */
 import React, { useMemo } from 'react'
+import { CldImage } from 'next-cloudinary'
 import { ComponentMap, getMDXComponent } from 'mdx-bundler/client'
 import Image from './Image'
 import CustomLink from './Link'
@@ -21,6 +22,7 @@ export const MDXComponents: ComponentMap = {
   wrapper: Wrapper,
   //@ts-ignore
   BlogNewsletterForm,
+  CldImage,
 }
 
 interface Props {

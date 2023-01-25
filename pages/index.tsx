@@ -1,10 +1,12 @@
+import { GetStaticProps, InferGetStaticPropsType } from 'next'
+import { CldImage } from 'next-cloudinary'
+
 import { IntroArticleLists } from '@/components/article'
 import { IntroVideo } from '@/components/IntroVideo'
 import Pagination from '@/components/Pagination'
 import { PageSEO } from '@/components/SEO'
 import siteMetadata from '@/data/siteMetadata'
 import { getAllFilesFrontMatter } from '@/lib/mdx'
-import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { PostFrontMatter } from 'types/PostFrontMatter'
 import { POSTS_PER_PAGE } from '@/constants/constants'
 
