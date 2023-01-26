@@ -1,5 +1,10 @@
-import NextImage, { ImageProps } from 'next/image'
+import { ImageProps } from 'next/image'
+import Image from 'next/future/image'
 
-const Image = ({ ...rest }: ImageProps) => <NextImage {...rest} />
+const NextImage = ({ ...rest }: ImageProps) => (
+  <div className="relative object-contain">
+    <Image {...rest} />
+  </div>
+)
 
 export default Image

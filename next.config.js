@@ -61,7 +61,7 @@ module.exports = withBundleAnalyzer({
   },
   reactStrictMode: true,
   images: {
-    domains: ['picsum.photos'],
+    domains: ['res.cloudinary.com'],
   },
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   eslint: {
