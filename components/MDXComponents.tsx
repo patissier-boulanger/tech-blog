@@ -2,11 +2,12 @@
 import React, { useMemo } from 'react'
 import { CldImage } from 'next-cloudinary'
 import { ComponentMap, getMDXComponent } from 'mdx-bundler/client'
-import Image from './Image'
+
 import CustomLink from './Link'
 import TOCInline from './TOCInline'
 import Pre from './Pre'
 import { BlogNewsletterForm } from './NewsletterForm'
+import Image from 'next/future/image'
 
 const Wrapper: React.ComponentType<{ layout: string }> = ({ layout, ...rest }) => {
   const Layout = require(`../layouts/${layout}`).default
