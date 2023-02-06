@@ -113,13 +113,14 @@ module.exports = {
               backgroundColor: theme('colors.gray.800'),
             },
             code: {
-              color: theme('colors.pink.500'),
-              backgroundColor: theme('colors.gray.100'),
+              color: theme('colors.gray.800'),
+              backgroundColor: theme('colors.gray.300'),
               paddingLeft: '4px',
               paddingRight: '4px',
               paddingTop: '2px',
               paddingBottom: '2px',
               borderRadius: '0.25rem',
+              fontWeight: '500',
             },
             'code::before': {
               content: 'none',
@@ -186,7 +187,8 @@ module.exports = {
               backgroundColor: theme('colors.gray.800'),
             },
             code: {
-              backgroundColor: theme('colors.gray.800'),
+              color: theme('colors.gray.100'),
+              backgroundColor: theme('colors.gray.600'),
             },
             details: {
               backgroundColor: theme('colors.gray.800'),
