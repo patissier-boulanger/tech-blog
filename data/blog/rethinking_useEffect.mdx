@@ -10,17 +10,15 @@ canonicalUrl:
 ---
 
 <Image
-  alt={'hihi'}
-  width="0"
-  height="0"
-  className="w-full h-auto"
+  alt={'confused using React'}
+  width="420"
+  height="234"
+  className="m-auto"
   sizes="(max-width: 768px) 100vw,
                 (max-width: 1200px) 48rem,
                 56rem"
-  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1674607351/rethinkingUseEffect/2_paozg5.webp"
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1674607352/rethinkingUseEffect/1_uaj2q6.gif"
 />
-
-// 이미지 1 //
 
 React를 사용해서 처음 무언가를 만들 때 느꼈던 감정은 어썸함이라기보단 당황스러움이었습니다.
 
@@ -63,7 +61,16 @@ _Why did we build React?_
 _React isn’t an MVC framework._
 _Reactive updates are dead simple._
 
-// 이미지 2 //
+<Image
+  alt={'confused using React'}
+  width="720"
+  height="435"
+  className="m-auto"
+  sizes="(max-width: 768px) 100vw,
+                (max-width: 1200px) 48rem,
+                56rem"
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1674607351/rethinkingUseEffect/2_paozg5.webp"
+/>
 
 당시 Meta(당시에는 facebook)의 기술 스택은 `php`와 인터랙션을 위한 조금의 Javascript으로 구성되어 있었습니다. Meta는 급속도로 성장하는 중이었고, 규모가 커지면서 개발자들은 점점 유지 보수에 많은 어려움을 겪고 있었습니다. 그 중 하나는 빈 알림 문제가 있었죠. 사용자의 알림에는 분명 빨간 불이 떴는데, 막상 눌러 보면 아무런 알림이 존재하지 않는 것이었습니다.
 
@@ -115,7 +122,16 @@ Redux의 개발자인 Dan Abramov 는 자신의 글에서 이렇게 말하고 �
 정확히 말하면 계속되는 함수의 호출을 통한 계속되는 트리의 생성, 생성된 트리의 계속되는 비교 과정에 외부 데이터를 포함시키는 과정을 추가하면 됩니다.
 _BOOM_. 그리고 이것이 바로 useEffect가 하는 일입니다. **React가 side Effect를 use할 수 있게 도와주는 Api 인 것입니다.**
 
-// 이미지 3
+<Image
+  alt={'confused using React'}
+  width="720"
+  height="572"
+  className="m-auto"
+  sizes="(max-width: 768px) 100vw,
+                (max-width: 1200px) 48rem,
+                56rem"
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1674607351/rethinkingUseEffect/3_ch4kbp.webp"
+/>
 
 Dan Abramov가 설명한 useEffect 가이드에서 그는 useEffect를 React 트리 바깥의 외부의 데이터를 동기화 시킬 수 있게 해주는 것이라고 설명하고 있습니다.
 따라서 정확히 말하면 외부 데이터를 포함시키는 것이 아니라 동기화에 가깝습니다.
