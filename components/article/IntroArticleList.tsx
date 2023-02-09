@@ -38,7 +38,7 @@ export function IntroArticleLists({ posts }: IntroArticleListsProp) {
                   </div>
                 </article>
 
-                <div className="flex flex-wrap">
+                <div className="mt-12 flex flex-wrap">
                   {tags.map((tag) => (
                     <Tag key={tag} text={tag} />
                   ))}

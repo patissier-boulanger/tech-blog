@@ -1,0 +1,229 @@
+---
+title: React Native Webview로 카카오톡 로그인 구현하기
+date: '2023-01-13'
+tags: ['React Native', 'KAKAO-LOGIN']
+draft: false
+summary: 로그인 로직이 이미 웹으로 구현되어 있을 경우, 앱에서 다시 해당 로직을 구현하는 것은 귀찮은 일입니다. 다행히도 카카오는 2018년부터 웹뷰를 사용하는 하이브리드 웹에서의 로그인을 지원하기 시작했습니다. 이 글에서는 React-Native-Webview를 사용해서 카카오 로그인을 하는 방법을 알아보도록 하겠습니다.
+images: []
+layout: PostSimple
+canonicalUrl:
+---
+
+<Image
+  alt={'kakao login example'}
+  width="720"
+  height="449"
+  className="mx-auto my-12"
+  sizes="(max-width: 768px) 100vw,
+                (max-width: 1200px) 48rem,
+                56rem"
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1675922662/use_kakao_login_react_native_webview/1_BKPupcGiRqU1fFVKNIzMJw_zgadlu.webp"
+/>
+
+카카오톡 로그인을 구현하는 방법은 여러가지입니다. React Native로 앱을 개발하고 있을 경우 react-native-kakao-login 라이브러리를 사용하거나 혹은 Rest Api 방식으로 앱에서 모든 것을 다 해결할 수 도 있습니다.
+
+본 글에서는 Javascript Sdk를 사용해 카카오톡 로그인을 사용하는 방법을 알아보도록 하겠습니다. Sdk의 초기화나 앱 키와 같은 설정들은 카카오톡 문서를 참조해서 진행해 주세요. 여기서 설명하지는 않겠습니다.
+
+실제 코드를 보기 전에 카카오톡 로그인은 어떻게 진행되는지 간단하게 보도록 합시다.
+
+<br />
+
+### 카카오톡 로그인 간단 플로우
+
+<Image
+  alt={'kakao login example'}
+  width="720"
+  height="861"
+  className="m-auto my-12"
+  sizes="(max-width: 768px) 100vw,
+                (max-width: 1200px) 48rem,
+                56rem"
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1675922653/use_kakao_login_react_native_webview/1_Lo-mtyLwtPrTUytS9NvN6Q_sfxvs8.webp"
+/>
+
+로그인 플로우는 얼핏 보면 복잡해 보이지만 실은 간단합니다.
+
+1. Javascript Sdk를 사용한다면, 아래 함수를 실행해 카카오 로그인을 요청합니다.
+
+```js
+Kakao.Auth.authorize({ redirectUri: '${REDIRECT_URI}' })
+```
+
+2. 해당 함수가 호출되면 카카오 서버가 유저에게 카카오톡 로그인과 앱 로그인 동의를 요청합니다. 요청 방식은 유저 에이전트에 따라 다릅니다.
+
+3. 유저가 카카오톡 로그인과 동의를 완료하면 아까 Kakao.Auth.authorize 함수에 인자로 보냈던 redirectUri로 카카오톡 서버가 인가 코드를 보내게 됩니다.
+
+4. 해당 redirectUri(우리 서버)는 이제 인가 코드를 받아서 카카오톡 서버에 카카오톡 토큰을 요청합니다.
+
+5. 발급된 카카오톡 토큰을 통해서 해당 서비스에 회원가입 등 원하는 동작을 수행합니다.
+
+프론트측에서 할 일은 다음과 같습니다. 먼저 Kakao.Auth.authorize를 호출합니다. 카카오톡 토큰 발급이 끝난 후 서버에서 돌려주는 정보를 통해 인증 여부를 판단해서 적절한 스크린으로 라우팅합니다.
+
+<br />
+
+### 하이브리드 앱 카카오톡 로그인
+
+카카오톡 로그인은 2018년경까지 웹뷰를 사용하는 하이브리드 앱을 공식적으로 지원하지 않았었지만 이제는 지원합니다. 웹뷰를 사용하는 하이브리드 앱의 경우 특별한 설정을 몇가지 해주어야 합니다.
+Javascript Sdk 문서의 하이브리드 앱에 적용하기 문서를 보면 웹뷰를 사용하는 네이티브 앱에서 어떻게 설정해야 하는지 잘 나와 있습니다.
+
+React Native로 개발하는 입장에서 문제는 설정 방법이 네이티브 언어로만 설명되어 있다는 것입니다. react-native-webview는 iOS의 웹킷, android의 웹뷰를 감싼 wrapper 형태이므로 해당 설정을 그대로 사용하고 싶다면 라이브러리를 수정해야 합니다.
+
+<br />
+
+### iOS
+
+iOS의 경우 Kakao.Auth.authorize 함수를 호출 할 경우 유니버셜 링크 형태의 주소가 날아오고 자동으로 리다이렉션 되게 됩니다.
+
+- 앱이 있는 경우에 앱을 열고 간편 로그인을 실행합니다.
+- 앱이 없는 경우에는 유니버셜 링크의 경우 해당 url로 리다이렉션 되고, 앱 링크의 경우 fallback URL로 리다이렉션 됩니다.
+
+iOS의 경우 공식 문서에도 적혀 있듯 유니버셜 링크가 호출 되었을 경우 특별한 처리 없이 바로 앱이 실행이 가능합니다. 그러나 몇가지 주의사항이 있습니다.
+
+첫번째 주의사항은 유니버셜 링크는 **자바스크립트로 트리거**되면 앱을 실행하지 않는다는 것입니다.
+
+Kakao.Auth.authorize 를 실행하는 버튼이 있다고 생각해 봅시다. 유저의 직접적인 터치 없이 ref값을 잡아서 click한다던지, click 이벤트를 흉내내서 dispatch한다던지 하는 모든 행위들은 앱을 열지 않습니다. 즉, 유저의 직접적인 터치 없이는 앱을 열 수 없으니 유의해야 합니다. 따라서 아래와 같은 플로우는 불가능합니다.
+
+1. 네이티브 페이지에서 버튼을 누름
+2. 빈 웹뷰 페이지에서 Kakao.Auth.authorize 를 자동적으로 실행
+
+이 경우 간편 로그인이 실행되지 않아 항상 이메일을 요구하는 웹 페이지가 켜지게 됩니다.
+
+두번째 주의사항은 유니버셜 링크만으로 **카카오톡의 설치 여부를 판별할 수 없다**는 것입니다. 따라서 아래와 같은 플로우는 불가능합니다.
+
+1. Kakao.Auth.authorize 실행
+2. 앱의 설치 여부 판별
+3. 앱이 설치되어 있을 경우 그대로 진행
+4. 앱이 설치되지 않았을 경우 리다이렉트 될 이메일 로그인 페이지는 모달에서 띄움
+
+유니버셜 링크는 보통의 Url 형식과 같으므로 React Native가 제공하는 Linking Api의 canOpenUrl 메소드를 사용한다 하더라도, 항상 true를 리턴합니다. 왜냐하면 항상 열 수 있기 때문-딥 링크 형식이 아니기 때문입니다.
+
+마지막 주의사항은 react-native-webview에서 originWhitelist 를 지정하지 않을 경우 새 창에서 열리게 된다는 것입니다.
+보통의 경우 앱 내부의 웹뷰 안에서 처리하길 원할 것이므로, originWhitelist를 지정해야 합니다.
+
+<br />
+
+### Implementation
+
+```jsx
+return (
+  <RNWebView
+    ref={(ref) => (webViewRef.current = ref)}
+    source={{
+      method: GET,
+      uri,
+    }}
+    startInLoadingState={true}
+    nestedScrollEnabled={false}
+    originWhitelist={['*']}
+    renderLoading={handleRenderLoading}
+    renderError={handleRenderError}
+    onShouldStartLoadWithRequest={handleOnShouldStartLoadWithRequest}
+  />
+)
+
+// request 핸들러
+const handleOnShouldStartLoadWithRequest = (event: ShouldStartLoadRequest) => {
+  if (event.url.startsWith(`${TOKEN_PATH}`)) {
+    const token = extractToken(event.url)
+
+    login(token)
+
+    return false
+  }
+
+  return true
+}
+```
+
+pseudo code로 구현하면 이렇게 됩니다. 사실 따로 처리할 것이 없습니다. onShouldStartLoadWithRequest 프로퍼티를 통해 웹뷰의 리퀘스트를 가로채서 웹뷰의 요청은 중단하고, 서버에서 보내주는 토큰만 파싱해서 로그인을 진행하면 됩니다.
+
+해당 방식 외 리퀘스트 처리를 하지 않고 우리 서버에서 인증이 완료되었다는 메세지만 post Message로 받아 사용할 수 도 있습니다.
+
+<br />
+
+### Android
+
+Android의 경우 카카오톡 로그인을 사용하기 위해서는 네이티브 영역에서 추가 조치들을 해주어야 정상적으로 작동합니다. 우선 manifest에 패키지 명을 추가해야 하고, 안드로이드 웹뷰의 메서드를 오버라이딩하여 카카오가 준 Intent를 파싱하고, 액티비티- 앱을 실행해야 합니다.
+
+react-native-webview는 네이티브 웹뷰의 프로퍼티를 오버라이드 할 수 있는 기능을 자바스크립트로 제공하지 않으므로 해당 메서드를 오버라이드 하기 위해서는 라이브러리를 fork해서 수정해야 합니다.
+
+### Implementation
+
+React Native Webview 라이브러리를 포크해서, RNCWebViewManager.java 파일의 해당 부분을 수정해주도록 합시다.
+
+```java
+
+import android.content.Intent;
+import java.net.URISyntaxException;
+
+//
+
+
+@TargetApi(Build.VERSION_CODES.N)
+@Override
+public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+  Log.d(TAG, request.getUrl().toString());
+  final String url = request.getUrl().toString();
+
+  ReactContext mReactContext = (ReactContext) view.getContext();
+
+  if (url == null || url.startsWith("http://") || url.startsWith("https://")) {
+    Log.d(TAG, "url is not intent");
+    return this.shouldOverrideUrlLoading(view, url);
+  }
+
+  try {
+    // Intent 생성
+    Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+    PackageManager packageManager = mReactContext.getPackageManager();
+
+    //실행 가능한 앱이 있으면 앱 실행
+    if (intent.resolveActivity(packageManager) != null) {
+      Log.d(TAG, "has APP");
+      mReactContext.startActivity(intent);
+      Log.d(TAG, "ACTIVITY: ${intent.`package`}");
+      return true;
+    }
+
+    // Fallback URL이 있으면 현재 웹뷰에 로딩
+    String fallbackUrl = intent.getStringExtra("browser_fallback_url");
+    if (fallbackUrl != null) {
+      Log.d(TAG, "has fallbackUrl");
+      view.loadUrl(fallbackUrl);
+      Log.d(TAG, "FALLBACK: $fallbackUrl");
+      return true;
+    }
+    Log.e(TAG, "Could not parse anythings");
+  } catch (URISyntaxException e){
+    Log.e(TAG, "Invalid intent request", e);
+  }
+
+  return this.shouldOverrideUrlLoading(view, url);
+}
+```
+
+shouldOverrideUrlLoading은 안드로이드 웹뷰의 메소드로써 true를 리턴할 경우 현재 웹뷰의 Url 로딩을 중단합니다. false일 경우는 로딩을 중단하지 않습니다.
+
+따라서 intent 형식의 url이 웹뷰에 들어올 경우, 해당 intent를 파싱해서 다음과 같은 행동을 합니다.
+
+1. intent 형식인데 앱이 있는 경우에는 웹뷰의 로딩을 중단하고, 앱을 엽니다.
+2. intent 형식인데 사용 가능한 앱이 없는 경우 현재 웹뷰에서 파싱한 fallback url을 엽니다.
+3. intent 형식이 아닌 경우 원래대로 진행합니다.
+
+package.json에서 fork한 해당 라이브러리를 사용하도록 수정해 주고, 카카오톡 로그인을 실행해 보면 정상적으로 앱이 있는 경우 간편 로그인을, 없는 경우 해당 웹뷰에서 이메일 로그인 화면을 띄우는 것을 보실 수 있을 것입니다.
+
+> 1. 여러 레퍼런스에서 예시처럼 react-native-send-intent 를 활용하면 아래와 같이 intent 파싱을 웹뷰 영역에서 실행할 수 있지만, react-native-webview 11.22.2 버전 기준으로 카카오톡의 intent는 scheme이 파싱되지 않는 버그가 존재합니다.
+
+> 2. react-native-send-intent 가 아니라 React Native가 제공해주는 Linking 을 사용한다면 웹뷰의 request를 중단할 경우 로그인이 진행 되지 않습니다.
+
+> 3. request를 끊지 않고 Linking으로 intent를 열 경우, 기존의 앱과 intent로 열리는 크롬, 혹은 카카오톡 양쪽에서 로그인이 진행됩니다. 어떻게 짜느냐에 따라서 작동은 하겠지만 좋은 UX는 아닐 것입니다.
+
+<br />
+
+### 마치면서
+
+이렇게 해서 react-native-webview로 카카오톡 로그인 하는 방법을 살펴보았습니다.
+
+네이티브 모듈로 카카오 로그인을 하는게 가장 native look and feel을 살릴 수 있는 방법이지만, 효율적으로 리소스를 사용하기 위해서는 웹뷰를 사용할 수 밖에 없는 경우가 있습니다.
+
+그러한 경우에 본 글이 도움이 되었길 바라며 글을 마치도록 하겠습니다. 읽어주셔서 감사합니다.
