@@ -7,6 +7,17 @@ summary: '웹 사이트를 개발 하다 보면 이미지 처리에 대해서 �
 layout: PostSimple
 ---
 
+<Image
+  alt={'confused using React'}
+  width="800"
+  height="274"
+  className="mx-auto"
+  sizes="(max-width: 768px) 100vw,
+                (max-width: 1200px) 48rem,
+                56rem"
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676276351/next_js_image_component/0_VKIHtDyGUAmtkFX3_ed26tb.webp"
+/>
+
 웹 사이트를 개발 하다 보면 이미지 처리에 대해서 고민하게 되는 시점이 옵니다. 이미지를 responsive하게 늘리는 법이나 preload를 통해 미리 이미지를 로드, 혹은 사용성을 위해 lazy loading을 시킨다던지 하는 것들이요. 웹사이트에서 이미지가 차지하는 영역이 굉장히 큰 만큼, 이미지를 최적화 하지 않고서는 사용성이 좋은 웹사이트를 만들 수 없을 것입니다.
 
 NEXT js는 이미지 최적화와 관련된 고민들을 대단히 간단하게 해결해 줍니다. 어떤 방법이냐면 간단합니다. 프레임워크가 제공하는 Image Component를 사용하기만 하면 됩니다. 최적화와 관련된 처리는 해당 컴포넌트가 모두 알아서 해 줍니다.
@@ -14,3 +25,76 @@ NEXT js는 이미지 최적화와 관련된 고민들을 대단히 간단하게 
 ```js
 import Image from 'next/image'
 ```
+
+이렇게 html의 이미지 태그가 아니라 해당 nextJS의 이미지를 사용한다면 다음과 같은 장점들을 누릴 수 있습니다.
+
+- **Improved Performance**: Always serve correctly sized image for each device, using modern image formats
+- **Visual Stability**: Prevent Cumulative Layout Shift automatically
+- **Faster Page Loads**: Images are only loaded when they enter the viewport, with optional blur-up placeholders
+- **Asset Flexibility**: On-demand image resizing, even for images stored on remote servers
+
+사용자가 어떠한 페이지를 누를 때 이미지가 로딩이 완료된 채로 보여야 한다고 생각해 봅시다. 단순히 image 컴포넌트의 prop인 `priority` 를 true로 주기만 하면 됩니다. 스크롤에 따라서 lazy loading 을 하고 싶으면 `lazyRoot` , `lazyBoundary`를 활용하세요.
+
+와우 그렇군요. 지금 당장 사용하러 가 볼게요! 하는 여러분. 잠시만 기다려 보세요. next js는 문서화를 무척이나 잘 해놓았지만, 해당 컴포넌트의 문서와 사용 방식은 조금 헷갈리는 부분이 존재합니다. 분명 이거 왜 이래? 하는 포인트가 발생할 것이라고 생각합니다.
+
+따라서 이번 글에서는 시행 착오 없이 해당 컴포넌트를 잘 활용하기 위해서 실제 이미지를 사용할 상황에 맞추어 next js Image component의 사용법을 알아보도록 하겠습니다.
+
+<Image
+  alt={'confused using React'}
+  width="1000"
+  height="667"
+  className="mx-auto"
+  sizes="(max-width: 768px) 100vw,
+                (max-width: 1200px) 48rem,
+                56rem"
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676276348/next_js_image_component/0_IKVBh53FcxzJpK0v_fdmxsz.jpg"
+/>
+
+서버에서 이미지가 날아온다고 가정해 보겠습니다.
+
+<br />
+
+### 이미지가 항상 고정된 값이었으면 좋겠어요!
+
+`fixed` 레이아웃을 사용해야 합니다. 뷰포트의 사이즈가 바뀌어도 이미지는 항상 같은 값을 유지합니다. width와 height를 명시해야 하며, width와 height는 실제 렌더링 될 이미지의 크기를 나타냅니다.
+
+<br />
+
+### 이미지가 원본 사이즈보다 커지지는 않지만, 작아졌으면 좋겠어요!
+
+medium의 이미지와 같은 케이스입니다. 해당 상황의 경우 기본 레이아웃인 `intrinsic` 을 사용해야 합니다. width와 height를 명시해 주어야 하며 width와 height는 실제로 렌더링 되는 이미지의 크기 px 값이 됩니다.
+
+즉 width와 height를 1000 x 1000으로 준다면 이미지는 1000 x 1000사이즈가 됩니다. 만약에 이미지의 컨테이너 width가 1000보다 작아진다면 자동적으로 이미지도 작아지게 됩니다. 이미지의 컨테이너 width가 1000보다 커진다면 이미지는 커지지 않습니다.
+
+원본 이미지의 크기를 모른다면 이미지 컴포넌트를 통해 보여질 이미지의 크기는 원본과 다를 수 있습니다. 이렇게 되면 `intrinsic` 은 `object-fit: cover` 처럼 이미지의 비율을 유지하면서 이미지의 사이즈를 채웁니다. 이 과정에서 이미지의 일부가 보이지 않을 수 있습니다.
+
+<br />
+
+### 이미지가 responsive하게 커지고 줄어들었으면 좋겠어요!
+
+이미지가 화면에 따라서 유연하게 늘어나고 줄어들어야 하는 경우가 있습니다. 이 경우 비율에 따라서 사용하게 될 레이아웃이 달라지게 됩니다.
+
+- 원본 이미지의 비율을 아는 경우
+
+`responsive` 레이아웃을 사용해야 합니다. width와 height를 명시해 주어야 하며 width와 height는 이미지의 비율(Aspect ratio)가 됩니다. 해당 이미지는 이미지 컨테이너의 사이즈에 맞게 줄어들고 커지게 됩니다. 즉 이미지 컨테이너의 크기가 커지면 height(실제 이미지의 높이입니다!)는 주어진 이미지의 비율에 따라서 알아서 커지게 됩니다.
+
+만약에 원본 이미지가 16:9 인데 1:1 로 width와 height를 준 경우, 이미지의 비율이 깨지게 됩니다. 그리고 유의할 점은 꼭 이미지 컨테이너가 display: block 속성을 가지고 있어야 합니다.
+
+해당 속성은 함정이 있는데, **비율을 무조건 명시**해 주어야 한다는 것입니다. 보통 이미지의 비율을 모른 채로 이미지가 오는 경우가 많은데 이 경우 원본 이미지와 컴포넌트에 넣은 비율이 달라서 보이는 이미지 비율이 깨지게 됩니다.
+
+- 원본 이미지의 비율을 모르는 경우
+
+따라서 이 경우 `responsive` 가 아닌 `fill` 레이아웃을 사용해야 합니다. width와 height를 명시해 줄 필요가 없습니다. 왜냐하면 말 그대로 컨테이너를 ‘채우기’ 때문입니다.
+
+이미지는 원본의 이미지 비율을 유지한 채로 컨테이너를 꽉 채우게 됩니다. 이때 `object-fit` 의 속성을 사용해서 어떻게 채울 것인지 선택할 수 있습니다.
+
+예를 들어서 원본 이미지의 크기가 1600 x 900이라고 해 봅시다. 이미지의 크기는 모르는 상태이니 `fill` 레이아웃을 사용해야 합니다. 이미지를 넣을 컨테이너의 크기는 500 x 500 입니다. 이 경우 `object-fit` 속성에 따라 이미지 처리 방식이 바뀌게 됩니다. 참고로 `object-fit` 속성은 이미지에 직접 적용해도 되지만, 컴포넌트의 `props` 으로 넣을 수도 있습니다. 공식 문서를 참조해 주세요!
+
+- `object-fit: contain` 을 사용한 경우, 비율을 유지하면서 컨테이너 안에 이미지를 온전히 넣습니다. 이 상황에서는 컨테이너와 원본 이미지의 비율이 맞지 않으므로 이미지에 레터박스가 생기게 됩니다. 16:9 이미지를 1:1 박스에 넣는다고 생각해 보세요.
+- `object-fit: conver` 를 사용한 경우 비율을 유지하면서 이미지를 컨테이너 안에 꽉 채웁니다. 원본과 컨테이너의 비율이 맞지 않는 경우 이미지를 비율을 유지하면서 늘려버리므로 주변부 영역이 잘릴 수 있습니다. 잘리는 부분을 컨트롤 하고 싶은 경우 `object-position` 을 사용하면 됩니다.
+
+`fill` 레이아웃은 이미지를 `absolute` 처리한다는 점에 유의해 주세요. 이미지 컨테이너가 꼭 `position: relative` 속성을 가지고 있어야 합니다. 이를 까먹는다면 머리를 감싸쥐고 왜 이미지가 레이아웃을 어지럽히는지 고민하고 있을 것입니다.
+
+이렇게 해서 상황에 따른 이미지 컴포넌트 사용법을 알아보았습니다. next js 이미지 컴포넌트를 사용하기 위해서는 `domain` 에 이미지 주소를 명시해야 하는 등 다른 설정들이 많이 있으니 꼭 해당 공식 문서를 읽어보기시길 바랍니다.
+
+next js는 무척이나 좋은 프레임워크라고 생각하지만 이를 잘 사용하기 위해서는 해당 프레임워크의 방식을 잘 따라야 합니다. 가끔은 귀찮지만, 좋은 퍼포먼스를 위해서 참는다고 생각하고 next js 이미지 컴포넌트를 사용해 보시길 바라겠습니다.
