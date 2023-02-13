@@ -3,8 +3,8 @@ import Image from 'next/future/image'
 
 const NextImage = ({ ...rest }: ImageProps) => (
   <div className="relative object-contain">
-    <Image {...rest} />
+    <Image {...rest} alt={'default alt'} />
   </div>
 )
 
-export default Image
+export default NextImage

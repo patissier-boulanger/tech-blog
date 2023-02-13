@@ -1,5 +1,4 @@
 import { GetStaticProps, InferGetStaticPropsType } from 'next'
-import { CldImage } from 'next-cloudinary'
 
 import { IntroArticleLists } from '@/components/article'
 import { IntroVideo } from '@/components/IntroVideo'
