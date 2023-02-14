@@ -51,7 +51,7 @@ const LayoutWrapper = ({ children }: Props) => {
               className="text-gray-900 dark:text-gray-100 sm:p-4"
               target="_blank"
               rel="noopener noreferrer"
-              href={'https://www.naver.com'}
+              href={'https://github.com/patissier-boulanger'}
             >
               <Icon kind="github" size={20} />
             </a>
@@ -59,7 +59,7 @@ const LayoutWrapper = ({ children }: Props) => {
               className="text-gray-900 dark:text-gray-100 sm:p-4"
               target="_blank"
               rel="noopener noreferrer"
-              href={'https://www.naver.com'}
+              href={'https://medium.com/@juhyoung.jung1992'}
             >
               <Icon kind="medium" size={20} />
             </a>
