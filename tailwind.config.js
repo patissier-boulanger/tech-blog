@@ -184,11 +184,11 @@ module.exports = {
               color: theme('colors.gray.100'),
             },
             pre: {
-              backgroundColor: theme('colors.gray.800'),
+              backgroundColor: theme('colors.gray.900'),
             },
             code: {
               color: theme('colors.gray.100'),
-              backgroundColor: theme('colors.gray.700'),
+              backgroundColor: theme('colors.gray.900'),
             },
             details: {
               backgroundColor: theme('colors.gray.800'),
