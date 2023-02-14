@@ -4,7 +4,7 @@ const siteMetadata = {
   headerTitle: 'JJh Blog',
   description: '프론트엔드 개발자 정주형의 블로그입니다',
   language: 'ko-kr',
-  theme: 'light', // system, dark or light
+  theme: 'system', // system, dark or light
   siteUrl: 'https://orangebrother.dev',
   siteRepo: 'https://github.com/patissier-boulanger/Blog_Portfolio_v2',
   siteLogo: '/static/images/logo.png',
