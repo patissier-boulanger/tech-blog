@@ -25,6 +25,7 @@ export function IntroVideo() {
             muted={true}
             loop={true}
             controls={false}
+            playsInline={true}
             preload="auto"
           ></video>
         ) : (
