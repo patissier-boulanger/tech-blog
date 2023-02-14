@@ -23,7 +23,7 @@ export default function Pagination({ totalPages, currentPage }: Props) {
             <Icon kind="arrowLeft" size={20} />
           </Link>
         )}
-        <span className="text-gray-700">
+        <span className="text-gray-700 dark:text-gray-400">
           {currentPage} of {totalPages}
         </span>
         {!nextPage && (
