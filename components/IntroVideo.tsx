@@ -10,13 +10,17 @@ export function IntroVideo() {
     setMounted(true)
   }, [])
 
+  console.log(mounted, 'mounted')
+
   return (
     <div className="min-h-[200px] flex-1">
       <div className="relative m-auto h-[350px] w-full sm:h-[600px] sm:w-[600px]">
         {mounted ? (
-          theme === 'light' ? (
+          <>
             <video
-              className="absolute object-contain"
+              className={
+                theme === 'light' ? 'absolute z-50 object-contain' : 'absolute z-0 object-contain'
+              }
               src={'/static/videos/introVideo_Light.mp4'}
               autoPlay={true}
               muted={true}
@@ -24,9 +28,10 @@ export function IntroVideo() {
               controls={false}
               playsInline={true}
             ></video>
-          ) : (
             <video
-              className="absolute object-contain"
+              className={
+                theme !== 'light' ? 'absolute z-50 object-contain' : 'absolute z-0 object-contain'
+              }
               src={'/static/videos/introVideo_Dark.mp4'}
               autoPlay={true}
               muted={true}
@@ -34,7 +39,7 @@ export function IntroVideo() {
               controls={false}
               playsInline={true}
             ></video>
-          )
+          </>
         ) : (
           <></>
         )}

@@ -1,8 +1,8 @@
 const siteMetadata = {
-  title: 'Orangebrother',
+  title: '정주형의 기술 블로그입니다',
   author: '정주형',
   headerTitle: 'Orangebrother',
-  description: '정주형의 기술 블로그입니다',
+  description: '개발에 관련된 것을 씁니다',
   language: 'ko-kr',
   theme: 'system', // system, dark or light
   siteUrl: 'https://orangebrother.dev',
