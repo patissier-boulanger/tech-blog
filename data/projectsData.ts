@@ -1,3 +1,7 @@
+/**
+ * project 탭은 현재 사용되지 않습니다.
+ */
+
 const projectsData = [
   {
     title: 'A Search Engine',
