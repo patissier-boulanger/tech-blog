@@ -1,9 +1,9 @@
 import { ImageProps } from 'next/image'
-import Image from 'next/future/image'
+import NextImage from 'next/image'
 
-const NextImage = ({ ...rest }: ImageProps) => (
+const Image = ({ ...rest }: ImageProps) => (
   <div className="relative object-contain">
-    <Image {...rest} />
+    <NextImage {...rest} alt={'default'} />
   </div>
 )
 
