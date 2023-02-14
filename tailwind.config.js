@@ -44,7 +44,7 @@ module.exports = {
           dark: '#03DAC6',
         },
         backsheet: {
-          light: '#E5E5E5',
+          light: '#FFFFFF',
           DEFAULT: '#2A2A2A',
           dark: '#2A2A2A',
         },
