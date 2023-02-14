@@ -25,10 +25,10 @@ const LayoutWrapper = ({ children }: Props) => {
             <Link href="/" aria-label={siteMetadata.headerTitle}>
               <div className="flex flex-row items-start justify-between">
                 <div>
-                  <div className="mr-3 font-serif text-base font-bold text-gray-800 dark:text-gray-400">
+                  <div className="mr-3 font-serif text-base font-bold text-gray-800 dark:text-gray-100">
                     정주형의 블로그
                   </div>
-                  <div className="font-serif text-gray-500 dark:text-gray-400">
+                  <div className="font-serif italic text-gray-500 dark:text-gray-400">
                     Write Dev Articles
                   </div>
                 </div>
