@@ -1,0 +1,250 @@
+---
+title: React native 개발자를 위한 iOS 빌드 환경 분리하기
+date: '2023-9-11'
+tags: ['React Native', 'iOS']
+draft: false
+summary: 내 로컬에서는 잘 되는데..? 라는 말을 한번쯤 해 보신 적이 있으실 겁니다. 개발자의 컴퓨터에서 로컬 서버로 테스트 했을때는 잘만 되던 기능이 실제 프로덕션 앱에서는 작동하지 않는 일이 개발을 하다 보면 비일비재합니다.
+images: []
+layout: PostSimple
+canonicalUrl:
+---
+
+<Image
+  alt={'Burning house'}
+  layout="fixed"
+  width={600}
+  height={450}
+  sizes="(max-width: 768px) 100vw,
+                (max-width: 1200px) 48rem,
+                56rem"
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676430594/iOS-build-setting-for-react-native-developers/2_d1qnol.webp"
+/>
+
+내 로컬에서는 잘 되는데..?
+
+라는 말을 한번쯤 해 보신 적이 있으실 겁니다. 개발자의 컴퓨터에서 로컬 서버로 테스트 했을때는 잘만 되던 기능이 실제 프로덕션 앱에서는 작동하지 않는 일이 개발을 하다 보면 비일비재합니다.
+
+앱 개발을 하다가 해당 문제가 발생했다고 생각해 봅시다. 분명 잘 되는 것을 확인해서 올렸는데, 프로덕션에 있던 앱이 터져버렸습니다. 문제를 해결하고 다시 빌드와 배포를 하는 동안 해당 앱을 사용하고 있던 유저는 분명 좋지 않은 경험을 받게 될 것입니다.
+
+만약 앱을 환경별로 구성해서 테스트를 진행 했었다면 어땠을까요? 보통 이러한 상황을 피하기 위해 보통 어플리케이션을 다음과 같은 세가지 환경으로 나눕니다.
+
+<Image
+  alt={'local dev prod'}
+  layout="fixed"
+  width={720}
+  height={348}
+  sizes="(max-width: 768px) 100vw,
+                (max-width: 1200px) 48rem,
+                56rem"
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676430593/iOS-build-setting-for-react-native-developers/3_ujtier.webp"
+/>
+
+각 프로젝트마다 세분화 될 수 있지만 기본 틀은 다음과 같습니다. 각자의 역할은 다음과 같습니다. Production부터 보도록 합시다.
+
+Production은 말 그대로 실제 제품의 환경을 뜻합니다. 실제 유저 데이터가 있는 서버와 연동되어 있으며 이미 테스트가 다 되어 안정적으로 동작하는 환경입니다.
+
+QA 혹은 Pre-production은 프로덕션의 환경과 거의 같습니다. 테스터들이 실제로 앱이 어떻게 동작할지 테스트를 합니다. 테스터가 없다면 etoe 테스트나 자동화된 테스트 해당 환경에서 실행합니다. 해당 단계에서 테스트가 통과된 앱은 Production 환경에 올릴 수 있게 됩니다.
+
+Dev 는 말 그대로 개발자들이 새로운 기능과 코드를 테스트 해 볼 수 있는 공간입니다. 보통은 로컬 서버와 연결이 되어 있습니다.
+
+이렇게 앱 분리함으로써 각각의 환경에서 테스트를 해보고 프로덕션에 올리게 된다면 앱의 안정성을 보장할 수 있는 것은 물론이고 개선점과 같은 점을 발견할 수 있을지도 모릅니다.
+
+그러면 이제 실제 React native 앱을 최소한의 코드 수정을 통해 각기 다른 3가지의 앱으로 분리해봅시다. 이 글은 다음과 같은 부분을 다룹니다.
+
+- schema의 분리를 통한 여러 빌드 환경의 분리
+- 환경별 이름 설정, 개별 아이콘 설정
+- fastlane 설정
+
+### Before get started
+
+시작하기 전에 xcode를 다루기 위해 최소한의 개념을 정리하고 넘어가도록 하겠습니다. 이미 xcode에 익숙한 개발자라면 이 부분을 건너뛰셔도 무방합니다.
+
+### Xcode hierarchy
+
+<Image
+  alt={'xcode hierarchy'}
+  layout="fixed"
+  width={720}
+  height={508}
+  sizes="(max-width: 768px) 100vw,
+                (max-width: 1200px) 48rem,
+                56rem"
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676430593/iOS-build-setting-for-react-native-developers/4_mul0d8.webp"
+/>
+
+```text
+Workspace
+  -> Project
+    -> Target
+     -> Dependency
+      -> Scheme
+        -> Action
+        -> Build Configuration
+          -> Build Configuration File(.xcconfig)
+```
+
+xcode의 구조는 다음과 같이 이루어져 있습니다.
+
+**Workspace**는 가장 큰 단위로써 프로젝트들의 집합입니다. 프로젝트끼리의 dependency를 관리합니다.
+
+**Project**는 타겟들의 집합입니다. 코드와 리소스를 포함하고 있으며 주로 iOS 개발 시 주로 프로젝트를 사용하게 됩니다. 타겟의 경우도 코드와 리소스를 포함하고 있다고 말했는데 정확히 말하면 프로젝트의 소스를 타겟별로 빌드하는 것에 가깝습니다.
+
+또한 프로젝트는 자신이 가지고 있는 타겟들에게 default 설정을 제공해 줍니다. 타겟이 스스로 설정을 가지고 있다면 이는 프로젝트의 빌드 세팅을 오버라이드 합니다.
+
+**Targets**은 가장 작은 단위의 제품입니다. 타겟 하나는 하나의 제품을 위한 소스코드와 리소스의 집합이며, 이들을 어떻게 빌드할지 설정을 포함합니다.
+
+즉 코드 하나를 여러 타겟이 공유할 수 있습니다. 아이패드, 아이폰 버전, 다른 브랜드 앱과 같은 약간의 차이점만을 가진 비슷한 제품들을 target으로 지정해서 만들 수 있습니다.
+
+**Scheme**은 하나의 타겟에 대해 어떤 액션을 어떤 설정으로 실행시켜야 하는지에 대한 하나의 프로세스라고 볼 수 있습니다. Scheme은 Action과 Build Configuration을 포함합니다. Action의 종류는 다음과 같습니다.
+
+- Run
+- Build
+- Test / 빌드 후 테스트를 실행합니다.
+- Profile / 특정 기기에서 퍼포먼스 체크용도로 사용됩니다.
+- Analyze / static analyzer를 사용해서 빌드를 진행하고 코드의 버그를 검사해 줍니다
+- Archive / 앱 스토어나 테스트 플라이트, 혹은 adhoc에 보내기 위해 코드 사이닝을 포함해서 빌드를 진행합니다.
+
+각각의 액션은 특정한 Build Configuration 하에서 실행됩니다. 하나의 타겟에는 하나 이상의 scheme이 필요합니다.
+
+이 정도만 숙지하고 있다면 괜찮을 것 같습니다. 그러면 이제 실제로 앱을 분리하도록 해봅시다.
+
+### Configuration
+
+project -> Info -> Configurations
+
+<Image
+  alt={'xcode'}
+  layout="fixed"
+  width={720}
+  height={115}
+  sizes="(max-width: 768px) 100vw,
+                (max-width: 1200px) 48rem,
+                56rem"
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676430593/iOS-build-setting-for-react-native-developers/5_r2zspl.webp"
+/>
+
+가장 먼저 할 일은 빌드 환경 설정을 추가하는 것입니다. 위에 있는 해당 주소로 이동해 주세요. 프로젝트의 빌드 configuration 란을 볼 수 있습니다. 앞에서 말했듯 프로젝트의 빌드 설정은 각 타겟 빌드의 디폴트 값입니다.
+
+보시면 기본적으로 xcode가 기본적으로 제공해 주는 두가지의 설정이 있는 것을 확인할 수 있습니다. Debug와 Release가 그것입니다. 디버그 빌드 설정은 앱을 시뮬레이터에서 돌릴 때 사용되며 릴리즈의 경우 앱스토어나 테스트 플라이트, adHoc의 경우에 사용됩니다.
+
+상단에 +버튼을 눌러서 각각의 기본 설정을 복사합시다. 최종적으로 설정은 이렇게 됩니다. 이름은 자유롭게 선택해 주세요.
+
+Dev 환경은 어차피 릴리즈 되지 않는 환경인데 왜 필요한가 의문이 생기실 수 있습니다. 시뮬레이터와 실제 기기에서 동작이 다른 경우가 있고, 우리의 목적은 결국 테스트플라이트에서 3가지 앱을 모두 받아보는 것이기 때문에 환경들 모두 릴리즈 버전이 필요합니다.
+
+- Release, Debug
+- QA.Release, QA.Debug
+- Dev.Release, Dev.Debug
+
+### Schemes
+
+product -> Scheme -> Edit Scheme
+
+해당 경로로 이동한 뒤 아래에 Duplicate Scheme 버튼을 눌러서 기존의 Scheme을 복사합시다. 버튼을 누르면 바로 기존의 Scheme이 복사됩니다. 우리가 만들 Scheme은 다음과 같습니다.
+
+- prod(기존에 존재하는 기본 scheme 입니다)
+- QA
+- Dev
+
+혹시 Scheme을 만들다가 실수하셨다면, Manage Schemes로 이동하셔서 삭제하면 됩니다. 아, 그리고 shared 버튼을 꼭 체크해서 다른 팀원들과 같은 scheme을 사용할 수 있게 해주세요!
+
+### Product Name
+
+Target -> Build Settings -> Product Name & Product Bundle Identifier
+
+Product Name은 앱에서 표시되는 이름입니다.
+
+먼저 Product Name을 설정해 봅시다. 프로젝트 폴더에 있는 info.plist의 파일을 다음과 같이 수정합니다. 이제 xcode build setting에서 설정한 PRODUCT_NAME이 앱에 표시될 것입니다.
+
+```text
+...
+<key>CFBundleDisplayName</key>
+<string>$(PRODUCT_NAME)</string>
+...
+```
+
+### Product Bundle Identifier
+
+Target → Build Settings → User-Definded
+
+Product Bundle Identifier는 앱스토어에서 앱을 구분하기 위해 사용되는 고유한 id입니다. 중복될 수 없습니다. 위의 경로로 이동해 + 버튼을 눌러 직접 SUFFIX를 추가합니다. 추가한 변수값은 다음과 같이 사용할 수 있습니다.
+
+```text
+...
+<key>CFBundleIdentifier</key>
+<string>$(PRODUCT_BUNDLE_IDENTIFIER)$(BUNDLE_ID_SUFFIX)</string>
+...
+```
+
+User-Definded에 각 build configuration으로 설정한 값이 들어가게 됩니다. 후술할 내용이지만 저는 fastlane에서 다음과 같은 설정으로 gym을 사용했을 경우, 제대로 된 프로파일을 설정하지 못하는 문제가 있었습니다.
+
+따라서 아래와 같이 값을 직접 하드코딩 해 주었습니다. 환경이 사실 많지 않으므로 별 문제가 되지 않을 것입니다. SUFFIX를 사용하고 싶다면 직접 gym에 프로파일을 매칭시켜 줄 수 있습니다.
+
+Optional: If gym can’t automatically detect the provisioning profiles to use, you can pass a mapping of bundle identifiers to provisioning profiles:
+
+```text
+...
+<key>CFBundleIdentifier</key>
+<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+...
+```
+
+### CocoaPods
+
+이제 각 scheme에 따라서 Podfile을 설정해 주어야 합니다. React Native 0.6x 부터 React Native는 기본적으로 CocoaPods를 빌드할때 사용하므로 따로 https://www.npmjs.com/package/react-native-schemes-manager 과 같은 라이브러리를 사용할 필요가 없습니다. 좋은 소식이죠?
+
+설정하는 방법은 매우 간단합니다. 다음과 같이 추가해 주시면 됩니다. 만약 문제가 있다면 https://guides.cocoapods.org/syntax/podfile.html#project 페이지를 참조해 주세요.
+
+```text
+project 'someProject',
+'Dev.Debug' => :debug,
+'Dev.Release' => :release,
+'Preview.Debug' => :debug,
+'Preview.Release' => :release,
+'Prod.Debug' => :debug,
+'Prod.Release' => :release
+```
+
+### Icons
+
+Target -> Build Settings -> Primary App Icon Set Name
+
+<Image
+  alt={'xcode'}
+  layout="fixed"
+  width={238}
+  height={96}
+  sizes="(max-width: 768px) 100vw,
+                (max-width: 1200px) 48rem,
+                56rem"
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676430593/iOS-build-setting-for-react-native-developers/6_b1sfh6.webp"
+/>
+
+우선 다음과 같이 폴더를 만들어서 iOS 규격에 맞춘 아이콘들을 넣어 줍시다. 폴더 네이밍은 다음과 같습니다.
+
+```text
+AppIcon.what-ever-you-want.appiconset
+```
+
+그리고 나서 위 경로로 이동해서 폴더 이름에 맞춰서 사용할 아이콘들을 설정합니다.
+
+### Fastlane Intergration
+
+혹시 Fastlane을 사용해서 CI 서버에서 자동화 과정을 통해 빌드와 배포를 진행할 경우 몇가지 수정해야 할 부분들이 존재합니다. 만약 앱스토어에 올리는 부분까지 pilot으로 진행하고 있다면, 우선 app store connect에 앱을 생성해야 합니다.
+
+- match
+  match를 사용해서 인증서를 팀원들과 공유할 경우 우선 dev와 qa 환경에 사용될 인증서를 저장한 repo에 추가해야 합니다. 추가 한 후 MatchFile에 다음과 같이 추가합니다.
+
+```ruby
+git_branch("master")
+app_identifier(["co.publr.ui", "co.publr.ui.dev", "co.publr.ui.preview"])
+```
+
+- gym
+
+```ruby
+gym(scheme: 'Preview')
+```
+
+해당 scheme에 맞춰서 빌드를 진행할 수 있도록 gym에 scheme의 이름을 넣어서 실행합니다.
+
+이렇게 해서 React native-ios에서 어떻게 앱을 환경별로 분리하는지 알아보았습니다. 읽어 주셔서 감사합니다.
