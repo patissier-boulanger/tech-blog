@@ -11,7 +11,7 @@ canonicalUrl:
 
 <Image
   alt={'confused using React'}
-  layout="fixed"
+  layout={'intrinsic'}
   width={420}
   height={234}
   sizes="(max-width: 768px) 100vw,
@@ -52,8 +52,6 @@ React는 useEffect 말고도 많은 Api들을 제공합니다. 이들을 사용�
 
 그래서 useEffect에 대한 궁금증에 답하기 전에 먼저 2011년으로 돌아가 보도록 하겠습니다.
 
-<br />
-
 ### Back to 2011
 
 _Why did we build React?_
@@ -63,7 +61,7 @@ _Reactive updates are dead simple._
 
 <Image
   alt={'old facebook photo'}
-  layout="fixed"
+  layout={'intrinsic'}
   width={720}
   height={435}
   sizes="(max-width: 768px) 100vw,
@@ -88,8 +86,6 @@ React가 채택한 새로운 방식은 이렇습니다. render 메소드가 호�
 
 기존의 방식이 빈 알림 문제와 같이 유지보수에 있어 많은 코스트를 일으키고 있었으므로, 새로운 방식을 택하는 것은 어쩌면 기정사실이었을 것입니다.
 
-<br />
-
 ### 순수성과 멱등성
 
 React가 웹 어플리케이션을 만드는 새운 방식은 계속되는 함수의 호출을 통한 계속되는 트리의 생성, 생성된 트리의 계속되는 비교입니다.
@@ -112,8 +108,6 @@ Redux의 개발자인 Dan Abramov 는 자신의 글에서 이렇게 말하고 �
 
 그러면 React는 결과에 패턴이 있을때 적합하다는데, 외부에서 데이터가 온다면 어떻게 하죠? 외부 데이터가 결과를 바꾼다면, 패턴이 망가지는 것이 아닐까요?
 
-<br />
-
 ### useEffect
 
 사이드 이펙트는 모던 어플리케이션 개발에 있어서 피할 수 없는 부분입니다. 할 수 없으면 즐기라는 말처럼, 답은 간단합니다.
@@ -124,7 +118,7 @@ _BOOM_. 그리고 이것이 바로 useEffect가 하는 일입니다. **React가 
 
 <Image
   alt={'use Effect process'}
-  layout="fixed"
+  layout={'intrinsic'}
   width={720}
   height={572}
   placeholder="blur"
@@ -146,8 +140,6 @@ Dan Abramov가 설명한 useEffect 가이드에서 그는 useEffect를 React 트
 
 이렇게 동기화를 통해, 패턴화를 방해하지 않으면서 성공적으로 React 외부의 데이터를 사용할 수 있게 되었습니다.
 
-<br />
-
 ### 답하기
 
 - 애초에 왜 useEffect를 사용해야 하는걸까요?
@@ -163,8 +155,6 @@ useEffect에 전달된 함수는 사이드 이펙트를 처리하기 위해 사�
 
 React의 모든 것은 끊임없이 변화합니다. 10년이 지나고, 100년이 지나도 렌더링되고 리렌더링을 반복할 것입니다.
 그러나 아무리 많은 시간이 지나더라도, 그 누구라도 변화 과정을 방해할 수 없습니다. 외부의 정보가 필요하다면, 변화를 막는 것이 아니라 해당 정보를 변화의 흐름의 일부분으로 만들어야 합니다.
-
-<br />
 
 ### 마치면서
 

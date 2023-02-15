@@ -8,6 +8,10 @@ type IntroArticleListsProp = {
 }
 
 export function IntroArticleLists({ posts }: IntroArticleListsProp) {
+  /**
+   * tailwind wordBreak 옵션은 3.2.0부터 추가되었습니다.
+   * https://github.com/tailwindlabs/tailwindcss/releases/tag/v3.2.0
+   */
   return (
     <>
       <ul>
@@ -27,11 +31,14 @@ export function IntroArticleLists({ posts }: IntroArticleListsProp) {
                     </dl>
                     <div className="space-y-5">
                       <div>
-                        <h2 className="min-h-[3rem] font-serif text-3xl font-bold leading-11 tracking-tight line-clamp-2 xl:min-h-[5.5rem]">
+                        <h2
+                          className="min-h-[3rem] font-serif text-3xl font-bold leading-11 tracking-tight line-clamp-2 xl:min-h-[5.5rem]"
+                          style={{ wordBreak: 'keep-all' }}
+                        >
                           {title}
                         </h2>
                       </div>
-                      <div className="prose max-w-none font-serif text-gray-800 line-clamp-4 dark:text-gray-300 ">
+                      <div className="prose max-w-none font-serif text-gray-800 line-clamp-4 dark:text-gray-300">
                         {summary}
                       </div>
                     </div>

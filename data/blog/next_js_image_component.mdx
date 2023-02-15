@@ -9,7 +9,7 @@ layout: PostSimple
 
 <Image
   alt={'next js logo'}
-  layout="fixed"
+  layout={'intrinsic'}
   width={800}
   height={274}
   sizes="(max-width: 768px) 100vw,
@@ -41,7 +41,7 @@ import Image from 'next/image'
 
 <Image
   alt={'nature photo'}
-  layout="fixed"
+  layout={'intrinsic'}
   width={1000}
   height={667}
   sizes="(max-width: 768px) 100vw,
@@ -52,13 +52,9 @@ import Image from 'next/image'
 
 서버에서 이미지가 날아온다고 가정해 보겠습니다.
 
-<br />
-
 ### 이미지가 항상 고정된 값이었으면 좋겠어요!
 
 `fixed` 레이아웃을 사용해야 합니다. 뷰포트의 사이즈가 바뀌어도 이미지는 항상 같은 값을 유지합니다. width와 height를 명시해야 하며, width와 height는 실제 렌더링 될 이미지의 크기를 나타냅니다.
-
-<br />
 
 ### 이미지가 원본 사이즈보다 커지지는 않지만, 작아졌으면 좋겠어요!
 
@@ -67,8 +63,6 @@ medium의 이미지와 같은 케이스입니다. 해당 상황의 경우 기본
 즉 width와 height를 1000 x 1000으로 준다면 이미지는 1000 x 1000사이즈가 됩니다. 만약에 이미지의 컨테이너 width가 1000보다 작아진다면 자동적으로 이미지도 작아지게 됩니다. 이미지의 컨테이너 width가 1000보다 커진다면 이미지는 커지지 않습니다.
 
 원본 이미지의 크기를 모른다면 이미지 컴포넌트를 통해 보여질 이미지의 크기는 원본과 다를 수 있습니다. 이렇게 되면 `intrinsic` 은 `object-fit: cover` 처럼 이미지의 비율을 유지하면서 이미지의 사이즈를 채웁니다. 이 과정에서 이미지의 일부가 보이지 않을 수 있습니다.
-
-<br />
 
 ### 이미지가 responsive하게 커지고 줄어들었으면 좋겠어요!
 
