@@ -10,10 +10,24 @@ export function IntroVideo() {
     setMounted(true)
   }, [])
 
+  useEffect(() => {
+    console.log('video fetch started')
+    fetch('http://localhost:3000/static/videos/introVideo_Dark.mp4').then((res) => {
+      console.log(res, 'blob?')
+    })
+  }, [])
+
   return (
     <div className="min-h-[200px] flex-1">
       <div className="relative m-auto h-[350px] w-full sm:h-[600px] sm:w-[600px]">
-        {mounted ? (
+        <button
+          onClick={() => {
+            fetch('http://localhost:3000/static/videos/introVideo_Dark.mp4').then((res) => {
+              console.log(res, 'blob?')
+            })
+          }}
+        ></button>
+        {/* {mounted ? (
           resolvedTheme === 'light' ? (
             <video
               className="absolute object-contain"
@@ -37,7 +51,7 @@ export function IntroVideo() {
           )
         ) : (
           <></>
-        )}
+        )} */}
       </div>
     </div>
   )
