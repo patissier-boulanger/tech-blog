@@ -15,6 +15,8 @@ import { Analytics } from '@vercel/analytics/react'
 import LayoutWrapper from '@/components/LayoutWrapper'
 import { ClientReload } from '@/components/ClientReload'
 
+const env = process.env.NODE_ENV
+
 const isDevelopment = process.env.NODE_ENV === 'development'
 const isSocket = process.env.SOCKET
 
@@ -24,10 +26,14 @@ export default function App({ Component, pageProps }: AppProps) {
       window.addEventListener('load', function () {
         navigator.serviceWorker.register('/sw.js').then(
           function (registration) {
-            console.log('Service Worker registration successful with scope: ', registration.scope)
+            if (env === 'development') {
+              console.log('Service Worker registration successful with scope: ', registration.scope)
+            }
           },
           function (err) {
-            console.log('Service Worker registration failed: ', err)
+            if (env === 'development') {
+              console.log('Service Worker registration failed: ', err)
+            }
           }
         )
       })

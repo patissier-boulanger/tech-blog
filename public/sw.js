@@ -1,9 +1,8 @@
-self.addEventListener('install', function (event) {
-  console.log('Hello world from the Service Worker 🤙')
+self.addEventListener('install', function () {
+  return
 })
 
 self.addEventListener('activate', () => {
-  console.log('sw activate')
   // eslint-disable-next-line no-undef
   clients.claim()
 })
