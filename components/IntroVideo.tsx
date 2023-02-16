@@ -18,7 +18,7 @@ export function IntroVideo() {
     }
 
     if (resolvedTheme === 'dark') {
-      fetch('http://localhost:3000/static/videos/introVideo_Dark.mp4')
+      fetch('https://orangebrother.dev/static/videos/introVideo_Dark.mp4')
         .then((response) => response.blob())
         .then((blob) => {
           videoRef.current.defaultMuted = true
@@ -26,7 +26,7 @@ export function IntroVideo() {
           videoRef.current.play()
         })
     } else {
-      fetch('http://localhost:3000/static/videos/introVideo_Light.mp4')
+      fetch('https://orangebrother.dev/static/videos/introVideo_Light.mp4')
         .then((response) => response.blob())
         .then((blob) => {
           videoRef.current.defaultMuted = true
