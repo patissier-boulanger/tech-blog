@@ -38,7 +38,7 @@ export function IntroVideo() {
 
   return (
     <div className="min-h-[200px] flex-1">
-      <div className="relative m-auto h-[350px] w-full sm:h-[600px] sm:w-[600px]">
+      <div className="relative m-auto h-[350px] w-[300px] sm:h-[600px] sm:w-[600px]">
         <video
           ref={videoRef}
           className="absolute object-contain"
