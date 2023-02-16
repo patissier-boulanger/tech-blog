@@ -21,6 +21,7 @@ export function IntroVideo() {
       fetch('http://localhost:3000/static/videos/introVideo_Dark.mp4')
         .then((response) => response.blob())
         .then((blob) => {
+          videoRef.current.defaultMuted = true
           videoRef.current.src = URL.createObjectURL(blob)
           videoRef.current.play()
         })
@@ -28,6 +29,7 @@ export function IntroVideo() {
       fetch('http://localhost:3000/static/videos/introVideo_Light.mp4')
         .then((response) => response.blob())
         .then((blob) => {
+          videoRef.current.defaultMuted = true
           videoRef.current.src = URL.createObjectURL(blob)
           videoRef.current.play()
         })
