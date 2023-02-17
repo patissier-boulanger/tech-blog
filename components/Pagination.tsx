@@ -19,7 +19,10 @@ export default function Pagination({ totalPages, currentPage }: Props) {
           </button>
         )}
         {prevPage && (
-          <Link href={currentPage - 1 === 1 ? `/` : `/blog/page/${currentPage - 1}`}>
+          <Link
+            className="text-gray-700 dark:text-gray-200"
+            href={currentPage - 1 === 1 ? `/` : `/blog/page/${currentPage - 1}`}
+          >
             <Icon kind="arrowLeft" size={20} />
           </Link>
         )}
@@ -27,12 +30,12 @@ export default function Pagination({ totalPages, currentPage }: Props) {
           {currentPage} of {totalPages}
         </span>
         {!nextPage && (
-          <button className="cursor-auto disabled:opacity-50" disabled={!nextPage}>
+          <button className="cursor-auto disabled:opacity-30" disabled={!nextPage}>
             <Icon kind="arrowRight" size={20} />
           </button>
         )}
         {nextPage && (
-          <Link className="text-gray-700" href={`/blog/page/${currentPage + 1}`}>
+          <Link className="text-gray-700 dark:text-gray-200" href={`/blog/page/${currentPage + 1}`}>
             <Icon kind="arrowRight" size={20} />
           </Link>
         )}
