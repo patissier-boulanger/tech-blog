@@ -19,7 +19,7 @@ export default function Pagination({ totalPages, currentPage }: Props) {
           </button>
         )}
         {prevPage && (
-          <Link href={currentPage - 1 === 1 ? `/blog/` : `/blog/page/${currentPage - 1}`}>
+          <Link href={currentPage - 1 === 1 ? `/` : `/blog/page/${currentPage - 1}`}>
             <Icon kind="arrowLeft" size={20} />
           </Link>
         )}

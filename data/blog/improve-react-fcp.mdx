@@ -1,0 +1,420 @@
+---
+title: React First Contentful Paint 최적화
+date: '2023-02-05'
+tags: ['REACT']
+draft: false
+summary: 로딩 시간이 3초를 넘어가면 사용자들은 대부분 사이트를 떠난다는 통계가 있습니다. 핀터레스트의 경우 모바일 웹 랜딩 페이지의 퍼포먼스를 60% 개선했더니 40%의 사용자가 더 가입했다고 합니다. 거꾸로 말하면 퍼포먼스가 60% 늦어진다면 40%가 사용자가 떠난다는 말과 같습니다. 기다리기 싫어하는 것은 어느 나라나 다 비슷하군요. 빨리 빨리의 화신들인 우리나라 사람이었다면 어땠을까요? 아마 2초가 지나기도 전에 이미 뒤로 가기 버튼을 눌렀을지도 모릅니다.
+images: []
+layout: PostSimple
+canonicalUrl:
+---
+
+### 서론
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={690}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621462/portfolio-improve/1_mMjXD75VGdXSMVjWXehk6A_1_jnsf5b.webp"
+/>
+
+<br />
+
+<center>https://juhyoungjung.com</center>
+
+포트폴리오 사이트를 만들었습니다. 배포를 마치고 나서 들어가 보았는데… 로딩 시간이 심상치 않았습니다. 인터넷 속도 문제였는지 몰라도, 배포한 첫날 들어가 보았더니 로딩이 끝날 때까지 대충 4초는 걸렸습니다. 이런.
+
+로딩 시간이 3초를 넘어가면 사용자들은 대부분 사이트를 떠난다는 통계가 있습니다. 핀터레스트의 경우 모바일 웹 랜딩 페이지의 퍼포먼스를 60% 개선했더니 40%의 사용자가 더 가입했다고 합니다. 거꾸로 말하면 퍼포먼스가 60% 늦어진다면 40%가 사용자가 떠난다는 말과 같습니다. 기다리기 싫어하는 것은 어느 나라나 다 비슷하군요. 빨리 빨리의 화신들인 우리나라 사람이었다면 어땠을까요? 아마 2초가 지나기도 전에 이미 뒤로 가기 버튼을 눌렀을지도 모릅니다.
+
+그래서 열심히 만든 사이트를 보지도 않고 떠나는 최악의 일을 막기 위해 최적화를 하기로 하였습니다. 이 글은 로딩 최적화를 하는 과정에서 생긴 의문들이나 개념들을 정리해서 적었습니다. 이 과정에서 조금씩 옆길로 샐 수 있으니 양해바랍니다.
+
+<br />
+
+### 로딩 시간 테스트
+
+일단 각을 잡고 로딩시간이 얼마나 걸리는지 테스트 해 보았습니다. 크롬 개발자 도구로 테스트 한 결과입니다.
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={26}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621585/portfolio-improve/1_AOX0khAVpm5hgdEW7oyHOw_1_afgdxn.webp"
+/>
+
+<br />
+
+메인 화면의 모든 것이 보이기까지는 3.1초 가량이 걸렸습니다. Get 요청이 들어가고 나서 의미 있는 컨텐츠(헤더)가 보이기까지는 1600ms, 1.6초 가량이 걸렸습니다.
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={27}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621621/portfolio-improve/1_dRTN9yyTNkmlZGsxIvNTqg_1_putkzm.webp"
+/>
+
+<br />
+
+퍼포먼스 말고 크롬 개발자 도구의 네트워크 탭에서 캐시를 비우고 다시 측정해 보았습니다. 흰 화면이 아닌 의미를 가진 컨텐츠가 나오기까지 1.77초, 전체 로딩이 끝나기까지 3.81초가 걸렸습니다. 다만 두번째 로딩부터(캐쉬가 된 이후부터)는 굉장히 빠른 로딩 속도를 보여주었습니다.
+
+증상을 파악했으니 수술을 들어가야 할 것 같습니다. 그러나 수술을 하기 전에 일단 왜 이런 증상이 생겼는지 아는 것이 순리입니다. 문제부터 파악해 보도록 합시다.
+
+왜 로딩 시간이 오래 걸릴까요?
+
+<br />
+
+### 왜 느릴까? 문제 파악하기
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={472}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621671/portfolio-improve/1_cTQR57XRH8YDAHLTnug8LA_1_zxn10y.webp"
+/>
+
+<br />
+
+예시로 삼고 있는 제 포트폴리오 사이트는 React 로 만들어졌으며 SPA(Single Page Application) 입니다. SPA라는 이름처럼 말 그대로 하나의 페이지로 만들어져 있는 어플리케이션입니다. 그 말은 SPA가 아닌 다른 사이트들은 여러 가지 페이지로 만들어져 있는 걸까요? 그렇습니다.
+
+웹사이트의 역사를 들여다 봅시다. 최초의 웹의 형태는 다음과 같았습니다. 클라이언트가 페이지를 요청하면 서버는 정적인 페이지를 줍니다. 서버에서 이미 그려진 페이지를 주니 서버 사이드 렌더링이라고 부릅니다. 그런데 이 경우에 페이지를 수정해야 할 일이 생기면 어떻게 해야 할까요? 다시 요청해야 합니다.
+
+시간이 지나고 기술들이 발달하면서 웹 페이지에서 동적인 요소들이 요구되기 시작합니다. 그런데 기존의 정적 페이지로는 이러한 사항을 구현하기 힘들었습니다. 한 페이지의 한 단어만 고치면 되는데, 그 단어를 고친 ‘새로운’ 페이지를 계속 달라고 해야 했으니 굉장히 비효율적이죠.
+
+이제 AJAX가 등장하게 됩니다. AJAX는 이러한 특징들을 가지고 있었습니다.
+
+- 페이지 새로고침 없이 서버에 요청
+- 서버로부터 데이터를 받고 작업을 수행
+
+즉 단어를 고칠 때 새로운 페이지를 받지 않아도 되는 것이죠. 예를 들면 쇼핑몰에서 스크롤을 내리면 새로운 상품들이 새로고침 되는 경우가 있습니다. 예전 방식의 정적 웹사이트였다면, 새로운 상품을 그려주기 위해 새로고침을 해 주어야, 즉 새 페이지를 받아야 했겠지만 이제는 그럴 필요가 없어졌습니다. AJAX 요청을 보내고 받은 JSON 데이터를 다시 그려주면 됩니다.
+
+<br />
+
+### SPA
+
+그리고 더 시간이 지나면서 이제 SPA라는 개념이 나오게 됩니다. 이전의 사이트들은 HTML과 CSS를 자바스크립트가 제어하는 수준이었다면 이제는 자바스크립트가 아예 HTML을 그리게 되었습니다.
+
+자바스크립트가 HTML을 그리므로 새로운 페이지를 요청할 필요가 없어졌습니다. 새 페이지로 가는 버튼을 눌렀다면, 로직에 따라 자바스크립트가 동작하고 새 화면을 그려줍니다. 기존의 사이트들이 새로운 페이지를 서버에 요청하고 페이지가 날아올때까지 기다려야 했다면 이제는 그럴 필요가 없어졌습니다. 새로고침이 없어지고 로딩 시간이 줄어들었습니다. 웹 사이트가 앱 같아진거죠.
+
+만약 새로운 데이터가 필요하다면 서버에 AJAX 요청을 보내고 받아온 데이터를 다시 그려줍니다. 클라이언트, 즉 브라우저가 페이지를 렌더링하게 되었으므로 CSR(Client Side Rendering) 이라고도 부릅니다. 그림으로 설명하자면 다음과 같습니다.
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={550}
+  height={609}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621738/portfolio-improve/1_Bu39125KpPVosEWDnDpqzw_1_qp2lmq.webp"
+/>
+
+<br />
+
+<br />
+
+### SPA는 로딩이 빠르다면서요? 당신 사이트는 React 로 만들었는데 왜 로딩이 느려요?
+
+답변하기에 앞서 브라우저는 페이지를 어떻게 그리는 지 부터 봅시다. 처음 사이트에 접속하면, 브라우저는 서버에 필수적인 파일들을 요청합니다. 그리고 HTML을 파싱해서 DOM Tree를 그리고, CSS를 파싱 해서 CSSOM을 그립니다. 그 다음 자바스크립트 파일을 실행하고 나서 Render Tree를 그립니다. 그리고 각 엘리먼트의 위치를 정하고 그리게 됩니다.
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={275}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621803/portfolio-improve/1_TlZOhu4WSHkPsq9-wK4-hg_1_svg8wr.webp"
+/>
+
+<br />
+
+그런데 아까 SPA는 자바스크립트로 HTML을 그린다고 말했던거 기억 나시나요? 자바스크립트가 웹 페이지를 렌더링하기 때문에 처음에 브라우저가 받은 HTML은 비어 있습니다. (이 때문에 SEO 문제가 생깁니다) 비어 있는 HTML을 받았으니 흰 화면이 보이게 됩니다. 렌더링 패스에 따라서 브라우저가 자바스크립트를 실행하고 나서야 비로소 페이지가 그려지게 됩니다.
+
+결국 브라우저가 자바스크립트를 실행하기 전까지 의미를 가지고 있는 컨텐츠가 보이지 않으므로, 초기 로딩에 시간이 걸린다는 것이 SPA의 단점입니다. 제 사이트의 경우도 마찬가지구요.
+
+제 사이트의 경우 Create-React-App 로 만들었습니다. Create-React-App 은 번들러로 Webpack 을 씁니다. 잠깐 번들러의 설명을 잠깐 해보도록 합시다.
+
+SPA는 자바스크립트로 화면을 다 그리게 되는데, 로직이 많아질 수록 코드의 양이 많아질 수 밖에 없는 것은 당연지사입니다. 이럴 때 각자의 코드를 나눠서 관리하면 유지 보수가 편해지겠죠? 따라서 독립적인 환경을 가지고 있는 파일인 모듈이 필요합니다. 그러나 자바스크립트는 본래 모듈을 지원하지 않았지만 할 수 있는 것들이 늘어나면서 지금은(ES5부터) 모듈을 지원하고 있습니다.
+
+그래서 이 여러가지 모듈 들을 한데 묶은 것이 번들러, 여기서는 Webpack입니다. 번들러는 모듈간의 의존성 문제를 해결해주고, 쓸모없는 파일들을 날려주는 Tree shaking이라던지 유용한 기능들이 많은데, 여기서는 일단 넘어가도록 하겠습니다.
+
+Webpack 이 웹사이트 구동에 필요한 파일들을 하나로 모아서 번들을 만듭니다. 브라우저는 critical rendering path에 따라 번들을 읽고 페이지를 렌더링 합니다.
+
+다만 현재 크롬과 같은 브라우저들은 자바스크립트 파일을 자동으로 캐싱 하므로 항상 긴 초기 로딩 시간을 겪을 필요는 없습니다. 캐싱 된 다음부터는 매우 빠른 속도를 보여 줍니다.
+
+<br />
+
+### 해결 방법 2가지
+
+이제 문제를 알았습니다. SPA의 초기 로딩 속도가 문제군요. 그러면 어떻게 해결해야 할까요?
+
+1.번들 사이즈를 줄이기
+
+당연하게도 사이즈를 줄일 수록 초기 로딩 속도는 올라갈 것입니다. 코드 분할이나, 이미지 사이즈를 줄인다던지 하는 해결 방법이 있습니다만 그 방법들은 밑에서 자세하게 설명하기로 하고, 일단 아예 새로운 접근 방식을 한번 볼까요?
+
+2. SSR
+
+SSR(Server Side Rendering)입니다. 근데 아까 서버 사이드 렌더링은 초기에 쓰던 방법이라고 하지 않았나요? 여기서 말할 SSR는 CSR(Client Side Rendering)의 장점과, SSR의 장점을 합친 형태에 가깝습니다. 장점들만 쏙쏙 골라서 만든 거죠. 이를 통해서 CSR의 단점들, 초기 로딩속도나 SEO문제를 해결할 수 있습니다. 거기에 원래 있던 장점들, 빠른 페이지 이동 등을 구현할 수 있는 것은 덤이구요.
+
+<br />
+
+### SSR
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={508}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621893/portfolio-improve/1_iS_3GAdl7tk26PfUd20FBw_1_vktjfg.webp"
+/>
+
+<br />
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={508}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621089/portfolio-improve/1_LeNYKBuw9F4vVbhh3fCH9w_hf8ts4.webp"
+/>
+
+<br />
+
+CSR과 SSR을 설명하는데 가장 많이 나오는 이미지입니다. 둘의 차이점이 보이시나요? 브라우저가 자바스크립트를 다 파싱하고 나서야 페이지가 상호작용이 가능한 상태가 되는 것은 같습니다만 SSR의 경우 유저에게 의미가 있는 콘텐츠를 자바스크립트를 다 읽기 전에 먼저 보여줍니다. 서버에서 초기 페이지를 미리 렌더링 해서 가져오기에 가능한 것입니다. 실제로 크롬 개발자 도구를 사용해서 예시를 보겠습니다.
+
+아래의 예시는 SPA에서 SSR을 가능하게 해주는 React의 프레임워크 NextJS 를 사용하였습니다.
+
+- Create-React-App
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={206}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621091/portfolio-improve/1_lcqDCBMk_uPvn_ZwYGvMZg_p2cyfw.webp"
+/>
+
+<br />
+
+- next JS
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={258}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621090/portfolio-improve/1_ETO1eAYnE1cEcgTRDc8row_cmqshj.webp"
+/>
+
+<br />
+
+SSR을 사용하는 NextJS 는 1000ms부터 바로 화면을 보여주는 반면, CSR인 Create-React-App 은 2000ms부터 화면이 보이기 시작합니다. 유저가 느끼는 체감속도는 SSR이 더 빠를 수 밖에 없습니다.
+
+이 페이지를 쓴 이유가 초기 로딩속도의 개선이었으니까, NextJS 를 사용해서 개발했다면 이 부분에서 만족할 만한 결과가 나왔을 것입니다. NextJS 는 페이지 이동시 기존의 CSR 방식을 사용하니까 이 부분도 걱정이 없구요.
+
+<br />
+
+### 해결책 — SSR을 사용하자
+
+초기 로딩 속도를 줄이려고 글을 썼으니, 해결책이 하나 나왔습니다. NextJS 를 사용해 개발을 하는 거죠. 초기 로딩 속도에 더해서 CSR의 단점인 SEO, 즉 HTML태그가 비어 있어서 구글의 크롤링 봇들이 페이지를 읽지 못하는 문제도 해결할 수 있습니다.
+
+단점이라면 NextJS 가 opinionated 하다는 것 정도? Create-React-App 과 비교해서 열심히 장단점을 찾아 보았는데, 솔직히 단점보다는 장점이 많은 것 같습니다. 괜히 핫한 것이 아니군요.
+
+나중에 같은 페이지를 NextJS 로 만들어서 시간 측정을 해보면 좋을 것 같지만, 이미 투입한 시간이 아까우므로 Create-React-App 을 사용하면서 로딩 속도를 줄이는 방법을 알아보도록 합시다.
+
+<br />
+
+### 번들 사이즈 줄이기
+
+CSR의 초기 로딩 속도를 줄이기 위해서는 번들 사이즈를 줄여야 합니다. 번들 사이즈를 줄이는 방법은 여러가지가 있습니다. 작은 것부터 차근차근 보도록 합시다.
+
+### 폰트
+
+> Always import your fonts from HTML, not CSS.
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={197}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621093/portfolio-improve/1_Gcx6gsXMIlaQPzL_c4Qo6Q_ytl6is.webp"
+/>
+
+<br />
+
+항상 폰트를 css에서 import 하는 것이 아니라, html에서 import 하도록 해야 합니다. 폰트 이야기만 하면 새로 한 페이지를 써야 할 테니까 핵심적인 부분만 보도록 합시다. 현재 사이트에서는 구글 웹 폰트를 쓰고 있습니다. 문제는 HTML에서 링크를 달아 놓은 것이 아니라, css에서 import를 하고 있다는 것입니다.
+
+이게 왜 문제가 될까요? 아까 본 그림처럼 브라우저는 critical rendering path에 따라서 페이지를 로드합니다. HTML을 파싱하고, css를 파싱한 뒤 렌더 트리를 만들죠. 그 말은 곧 css를 모두 파싱하기 전까지는 렌더 트리를 만들 수 없다는 것과 같습니다.
+
+결국 위의 사진과 같이 css 스타일 시트 내부에서 다른 스타일 시트를 import한다면 비는 시간이 생깁니다. 이 코드를 읽고 나서야 다운로드를 시작하니까요. 따라서 스타일 시트를 다 읽기 전에 폰트 다운로드를 받을 수 있다면 로딩 속도를 줄일 수 있을 것입니다. 계주달리기에서 어떻게 바톤 터치를 하는지 생각해 보세요. 더 빠르게 넘겨받기 위해서 앞 주자가 뛰는 걸 상상해 보면 됩니다.
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={140}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621094/portfolio-improve/1_CHZtcK_ICi-fbdfq4Nx_BQ_ds8us4.webp"
+/>
+
+<br />
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={202}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621095/portfolio-improve/1_w84ZkxeaiLncR6OBxVrhbg_txvwvm.webp"
+/>
+
+<br />
+
+<center>https://sia.codes/posts/making-google-fonts-faster</center>
+
+그리고 너무나 당연한 거지만, 꼭 필요한 폰트만 받아야 합니다. 받을 폰트가 적을수록 로딩은 빨라지겠죠?
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={441}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621096/portfolio-improve/1_07HM1ynzpYvljvpVr4_4IQ_cicfi3.webp"
+/>
+
+<br />
+
+평균적으로 이미지는 웹사이트에서 21% 정도의 용량을 차지한다고 합니다. 이미지 최적화가 곧 웹사이트의 최적화라고 할 수 도 있겠네요. 기본적으로 이미지 사이즈를 줄이고 알맞은 포맷을 선택하는 것이 좋습니다. https://imageoptim.com/mac 이런 사이트들에서 사이즈를 줄여봅시다. 가벼운 이미지는 png, 무거운 이미지는 jpeg를 사용해서 밸런스를 맞추는 건 물론이구요.
+
+그리고 jpeg를 사용할 경우 progressive JPEG를 사용하는 것이 유저의 체감 로딩 측면에서 더 좋은 효과를 가져올 수 있습니다. progressive JPEG가 무엇일까요? 현재 제 사이트의 이미지를 보면 Baseline JPEG, 즉 일반적인 JPEG 형식입니다. 일반적인 JPEG 형식은 한줄 한줄 이미지를 읽기 때문에 이미지가 천천히 위에서 아래로 로딩되는 것처럼 보이게 됩니다.
+
+다만 반대로 progressive JPEG의 경우 이미지의 프리뷰 전체를 낮은 화질로 보여줍니다. Baseline JPEG이 한줄 한줄 이미지를 로드한다면 반대로 낮은 퀄리티로 전체를 로드한 뒤 점차 고화질로 보여주는 방식이죠. 스켈레톤 UI와 비슷한 방식으로 유저에게 컨텐츠의 위치를 먼저 보여줄 수 있으니 더 나은 경험을 줄 수 있겠죠. 로딩 속도는 비슷할 테지만요.
+
+<br />
+
+### 코드 분할
+
+번들 사이즈를 줄이는 가장 쉬운 방법은 번들을 나누는 것입니다. 코드 분할을 통해서 당장 필요없는 컴포넌트들을 lazy-loading 할 수 있게 만들어 초기 로딩 속도를 줄일 수 있습니다. 모든 코드가 들어가 있는 번들을 불러오는 것보다 필요할 때 불러오게 하면 더 빠르게 페이지를 그릴 수 있습니다. 리액트에서 코드 분할은 lodable component라는 라이브러리를 사용해서 구현할 수 도 있지만, 여기서는 Suspense와 React.lazy를 사용하도록 하겠습니다.
+
+```jsx
+import React, { Suspense, lazy } from 'react'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+const Home = lazy(() => import('./routes/Home'))
+const About = lazy(() => import('./routes/About'))
+const App = () => (
+  <Router>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Switch>
+        <Route exact path="/" component={Home} />
+        <Route path="/about" component={About} />
+      </Switch>
+    </Suspense>
+  </Router>
+)
+```
+
+공식 문서의 예제를 가져왔습니다. 정말 간단하죠? Suspense의 fallback에 주어지는 jsx나 컴포넌트는 로딩중에 보여지게 됩니다.
+
+```jsx
+const Intro = lazy(() => import('./components/Intro/Intro'))
+const About = lazy(() => import('./components/About/About'))
+const Projects = lazy(() => import('./components/Projects/Projects'))
+const Contact = lazy(() => import('./components/Contact/Contact'))
+const App = () => {
+  return (
+    <>
+      <GlobalStyle />
+      <Header />
+      <Suspense
+        fallback={
+          <SpinnerContainer>
+            <LoadingSpinner />
+          </SpinnerContainer>
+        }
+      >
+        <AnimatePresence exitBeforeEnter>
+          <Switch location={location} key={location.pathname}>
+            <Route path="/" exact>
+              <Intro />
+            </Route>
+            <Route path="/about">
+              <About />
+            </Route>
+            <Route path="/projects">
+              <Projects />
+            </Route>
+            <Route path="/contact">
+              <Contact />
+            </Route>
+          </Switch>
+        </AnimatePresence>
+      </Suspense>
+    </>
+  )
+}
+export default App
+```
+
+제 코드에 동일하게 넣었습니다. 이제 network 탭을 보면 하나였던 chunk가 여러개로 나눠진 것을 볼 수 있습니다. 실제로 코드 분할을 적용했더니 체감 속도가 훨씬 빨라졌다는 것을 느낄 수 있었습니다. 그럼 마지막으로 로딩 최적화를 적용하고 난 결과입니다. 한눈에 결과를 볼 수 있도록PageSpeedInsights 에서 비교를 해 보았습니다.
+
+<br />
+
+### 결과
+
+로딩 최적화 전
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={397}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621098/portfolio-improve/1_yymuVwtUUtDH482YVIid4Q_bhtmto.webp"
+/>
+
+<br />
+
+로딩 최적화 후
+
+<br />
+
+<Image
+  alt={'devtools photo'}
+  layout={'intrinsic'}
+  width={720}
+  height={343}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676621099/portfolio-improve/1_NHvwzMufas7INisJR8UU1A_ssnuix.webp"
+/>
+
+<br />
+
+아직도 빨간색입니다. 그래도 로딩 점수가 18점에서 40점으로 상승하였습니다. 조금이라도 만족스러운 것은 FCP(First Contentful Paint)시간이 6.8초에서 3.4초로 줄어들었다는 것입니다. 흰 화면을 보는 시간이 줄어들게 되었습니다.
+
+다만 lazy loading을 적용하였기에 다른 페이지로 갈때 약간의 로딩이 생겼습니다. 그래도 초기 로딩이 긴 것보다는 용납할 수 있는 범위라고 생각합니다. 확실히 그냥 흰 화면을 보는 것보다 뭐라도 뜨는게 사용자 입장에서는 훨씬 좋은 경험인 것 같습니다. 유튜브가 스켈레톤 UI를 괜히 쓰는게 아니라는 생각이 듭니다.
+
+최적화는 아직도 갈길이 멀지만 이번 글은 여기서 마치도록 하겠습니다. 읽어주셔서 감사합니다.
