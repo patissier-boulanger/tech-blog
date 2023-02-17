@@ -1,0 +1,520 @@
+---
+title: Multiple React Native Apps with One Codebase
+date: '2022-08-13'
+tags: ['React Native', 'iOS', 'Android']
+draft: false
+summary: 함수 하나를 재사용 한다면 작업하는 시간을 아낄 수 있습니다. 여러 함수를 라이브러리로 만들어 재사용 한다면 작업하는 시간을 더욱 아낄 수 있습니다. 그렇다면 전체 코드베이스를 재사용 한다면 어떻게 될까요? 기능에 관련한 코드는 유지하고 패키지만 바꾼다면요?
+images: []
+layout: PostSimple
+canonicalUrl:
+---
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={700}
+  height={698}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676609892/multiple-react-native-apps-with-one-codebase-android/0_k_H2bcGt8FA1J1QW_dq48dm.webp"
+/>
+
+<br />
+
+함수 하나를 재사용 한다면 작업하는 시간을 아낄 수 있습니다.
+
+여러 함수를 라이브러리로 만들어 재사용 한다면 작업하는 시간을 더욱 아낄 수 있습니다.
+
+그렇다면 전체 코드베이스를 재사용 한다면 어떻게 될까요? 기능에 관련한 코드는 유지하고 패키지만 바꾼다면요?
+
+개발 시간은 단축할 수 있고, 새로운 패키지를 통해 다른 브랜드 경험을 줄 수 있을 것입니다. 손쉽게 차별화된 새로운 비즈니스를 만들어 낼 수 있는 것입니다.
+
+모바일 앱에서는 하나의 코드베이스를 통해 차별화된 여러 앱을 만드는 이러한 전략이 더욱 유효할 수 있습니다. 앱의 아이콘과 런치 스크린(스플래쉬 스크린)이 다르다면 우리는 보통 다른 제품이라고 느끼기 때문입니다.
+
+거기에 각 플랫폼들은 기본적으로 Multiple Apps 에 대한 효과적인 접근 방식을 제공합니다. 안드로이드의 경우 flavor라는 멋진 기능을 사용할 수 있으며, iOS의 경우 Target을 통해 Multiple Apps 을 쉽게 만들 수 있습니다.
+
+<br />
+
+# iOS
+
+성공적으로 iOS에서 한가지 코드베이스에서 여러 앱을 만들기 위해서는 먼저 몇가지를 알고 있어야 합니다.
+
+### Targets
+
+Targets은 가장 작은 단위의 제품입니다. 타겟 하나는 하나의 제품을 위한 소스코드와 리소스의 집합이며, 이들을 어떻게 빌드할지 설정을 포함합니다.
+
+즉 코드 하나를 여러 타겟이 공유할 수 있습니다. 아이패드, 아이폰 버전, 다른 브랜드 앱과 같은 약간의 차이점만을 가진 비슷한 제품들을 target으로 지정해서 만들 수 있습니다.
+
+> 타겟은 곧 같은 코드 베이스를 사용하는 다른 제품으로 이해해 주세요.
+
+### Scheme
+
+Scheme은 하나의 타겟에 어떤 액션을 어떤 설정으로 실행시켜야 하는지를 기록한 설명서입니다. Scheme은 Action과 Build Configuration을 포함합니다. Action의 종류는 다음과 같습니다.
+
+- Run
+- Build
+- Test / 빌드 후 테스트를 실행합니다.
+- Profile / 특정 기기에서 퍼포먼스 체크용도로 사용됩니다.
+- Analyze / static analyzer를 사용해서 빌드를 진행하고 코드의 버그를 검사해 줍니다
+- Archive / 앱 스토어나 테스트 플라이트, 혹은 adhoc에 보내기 위해 코드 사이닝을 포함해서 빌드를 진행합니다.
+
+Build Configuration은 환경변수들이 모여 있는 텍스트인 xcconfig 파일들을 어떤 빌드에 사용할 것인지를 설정합니다. 즉 어떤 환경변수를 어떤 빌드에 사용할지 다룹니다.
+
+Scheme을 정리하자면 소스 코드를 가지고 테스트, 실행, 빌드 등 여러 액션을 실행할 때 어떠한 설정으로 진행할 것인지를 다룬 설명서입니다. A타겟을 A scheme으로 실행할 수 있고, B타겟의 빌드를 A scheme으로 실행할 수 있습니다.
+
+### 시작하기 전에
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1400}
+  height={344}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676610666/multiple-react-native-apps-with-one-codebase-android/1_OW-fTTaoR-FKikGuUgZm2A_ul48bv.webp"
+/>
+
+<br />
+
+React Native 프로젝트를 처음 세팅하고 xcode로 프로젝트를 켜 보면 Debug와 Release라는 두가지 Build Configuration이 있는 것을 볼 수 있습니다. Debug Build Configuration 를 눌러 보면, 각 타겟별로 어떠한 configuration file(xcconfig 파일)을 사용할 지 설정해 줄 수 있습니다.
+
+아무것도 건드리지 않았다면 Cocoapods 전용 xcconfig 파일들이 보일 것입니다. 특별히 건들일이 없다면 이대로 두고 넘어갑시다.
+
+### Target Duplication
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1180}
+  height={671}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676610723/multiple-react-native-apps-with-one-codebase-android/1_9U18TVZN9Yr7w4UNQOI5tA_l43aec.webp"
+/>
+
+<br />
+
+기존에 존재하는 타겟을 누르고 복사합니다. 해당 타겟 이름 뒤에 copy가 붙은 채로 새로운 타겟이 생성되게 됩니다. 보기 싫으니 이름을 new Target으로 바꾸도록 하겠습니다.
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1180}
+  height={671}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676610776/multiple-react-native-apps-with-one-codebase-android/1_9bEYgom094GrlID2EbRUVA_osxyuh.webp"
+/>
+
+<br />
+
+이렇게 말이죠. 옆에 보면 복사한 타겟의 info.plist가 생성된 것을 알 수 있습니다. 이 친구의 이름도 바꿔주도록 합시다. plist는 Build configuration에 쓰이는 xcconfig 파일처럼 번들에 필요한 정보들을 담은 파일입니다.
+
+### Packaging
+
+새 제품을 만들었으니 이름을 바꿔줄 차례입니다.
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1203}
+  height={671}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676610826/multiple-react-native-apps-with-one-codebase-android/1_srO_v4qyEa27bfy5Mqj1PA_pyuebw.webp"
+/>
+
+<br />
+
+Build Settings에서 아까 바꾼 plist의 이름과 Product Bundle Identifier, Product Name을 바꿔 주도록 합시다. Product Bundle Identifier 는 제품의 유니크한 id입니다. Product Name은 실제로 핸드폰에 표시될 앱의 이름입니다. 모두 적었다면 plist가 해당 이름을 가져와서 사용할 수 있도록 변수로 입력해 줍시다.
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1203}
+  height={671}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676610826/multiple-react-native-apps-with-one-codebase-android/1_srO_v4qyEa27bfy5Mqj1PA_pyuebw.webp"
+/>
+
+<br />
+### Make Scheme
+
+모든 타겟은 하나 이상의 Scheme을 포함해야 합니다. 해당 타겟을 빌드하고 실행할때 사용할 Scheme을 생성하도록 합시다.
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1180}
+  height={671}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676610970/multiple-react-native-apps-with-one-codebase-android/1_Pi_ZUdbMxYrQPUcVbM-8Mg_dr7dpw.webp"
+/>
+
+<br />
+
+New Scheme을 누르면 해당 scheme이 어떤 타겟을 위해 쓰일 것인지 선택할 수 있습니다. 새 타겟을 위한 scheme이므로 newTarget을 선택해 줍시다.
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1180}
+  height={671}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676611021/multiple-react-native-apps-with-one-codebase-android/1_w0jh4_2AbSQE1lq6q6fOag_kaj2sg.webp"
+/>
+
+<br />
+
+타겟을 만들었고, 해당 타겟을 위한 scheme을 만들었습니다. 훌륭합니다. 참고로 이미 타겟을 복사할때 scheme이 생성되는데, 이 scheme의 이름을 manage scheme에서 변경해 주어도 상관 없습니다.
+
+그러면 이제 edit scheme을 눌러서 방금 만든 scheme을 확인해 보도록 합시다.
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1203}
+  height={671}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676611067/multiple-react-native-apps-with-one-codebase-android/1_SikgoTE8fjBVDG1jf2b7ug_lfyotc.webp"
+/>
+
+<br />
+
+각 액션들마다 Build configuration, 그리고 executable에 새로운 타겟이 설정되어 있는 것을 알 수 있습니다. 아까 Build configuration 에서 새로운 설정을 만들지 않았다면 따로 건들 것은 없습니다.
+
+### Podfile
+
+마지막으로 podfile을 수정해 주어야 합니다. 새로운 타겟을 아래와 같이 선언 해 줍시다. flipper는 빌드 시간을 증가시킨다는 문제가 있어 사용하지 않았습니다. post install 스크립트 또한 글로벌 스페이스로 빼 줍시다.
+
+7번과 8번줄의 코드는 Build configuration을 추가하지 않았다면 사용할 필요가 없습니다.
+
+```text
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+platform :ios, '11.0'
+
+project 'multipleTarget',
+'Dev.Debug' => :debug,
+'Dev.Release' => :release,
+
+target 'multipleTarget' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    # to enable hermes on iOS, change `false` to `true` and then install pods
+    :hermes_enabled => false
+  )
+end
+
+target 'newTarget' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    # to enable hermes on iOS, change `false` to `true` and then install pods
+    :hermes_enabled => false
+  )
+end
+
+post_install do |installer|
+  react_native_post_install(installer)
+  __apply_Xcode_12_5_M1_post_install_workaround(installer)
+end
+```
+
+타겟 분리는 이게 끝입니다. 무척 간단하죠. 실행을 해 보고 싶다면 해당 명령어로 실행을 해 볼 수 있습니다.
+
+```text
+react-native run-ios --scheme "newTarget"
+```
+
+이제 아까 설정한 product bundle Identifier를 app store connect에 등록하고 새로운 앱을 만들고 fastlane 혹은 ipa 파일을 업로드한다면 상용 배포 준비도 끝이 납니다.
+
+### Change AppIcon, LaunchScreen
+
+마지막으로 Multiple App의 핵심인 앱의 아이콘과 스플래시 스크린을 바꿀 차례입니다.
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1203}
+  height={671}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676611204/multiple-react-native-apps-with-one-codebase-android/1_srvKs93Hr1fgPac85VXHvg_tj8bqh.webp"
+/>
+
+<br />
+
+new Group으로 새 폴더를 만들어 줍시다.
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1203}
+  height={671}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676611275/multiple-react-native-apps-with-one-codebase-android/1_5WjUlAo8zXlFWB_xvZsQmA_duuxxf.webp"
+/>
+
+<br />
+
+그리고 new file을 눌러서 Asset Catalog를 추가해 주도록 합시다.
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1203}
+  height={671}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676611312/multiple-react-native-apps-with-one-codebase-android/1_UvxzAM8NKfxPO_Obq9QuMA_valcj1.webp"
+/>
+
+<br />
+
+편의를 위해 newTargetImages라는 이름을 지어 주었습니다. 해당 에셋이 newTarget에만 사용되도록 체크해줍시다.
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1203}
+  height={671}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676611350/multiple-react-native-apps-with-one-codebase-android/1_a4OZgPiCu8DZQux2qlud3g_hk3o35.webp"
+/>
+
+<br />
+
+이제 Asset Catalog 안에 앱 아이콘들을 추가해 줍시다. 앱 아이콘을 추가하는 법은 이곳에서 확인해 주시길 바라겠습니다.
+
+앱 아이콘이 추가되었다면 이제 스플래시 스크린(런치 스크린)을 추가할 차례입니다. 스플래시 스크린은 Asset Catalog 에서 추가가 가능했으나 이제 deprecated 되었고 따로 추가하여야 합니다.
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1203}
+  height={671}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676611381/multiple-react-native-apps-with-one-codebase-android/1_AxfMfJLmtW-VZomdh3Km2g_te8cz6.webp"
+/>
+
+<br />
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1203}
+  height={480}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676611407/multiple-react-native-apps-with-one-codebase-android/1_6RXqsGPtw6NOGnLu7KaZxw_ggk0oa.webp"
+/>
+
+<br />
+
+스플래시 스크린을 추가하는 방법은 이곳을 확인해 주세요. 성공적으로 앱 아이콘과 스플래시 스크린을 추가하였다면, 해당 타겟의 General 세팅에서 알맞는 아이콘과 스플래시 스크린을 선택해 주면 끝입니다.
+
+<br />
+
+<Image
+  alt={'ctrl c + ctrl v'}
+  layout={'intrinsic'}
+  width={1203}
+  height={480}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676611444/multiple-react-native-apps-with-one-codebase-android/1_R6LBGVHykYSOr0VDulslqQ_zfbinj.webp"
+/>
+
+<br />
+
+### Deployment
+
+타겟을 성공적으로 분리하였으니 fastlane을 사용해서 분리한 타겟을 app store connect에 명령어 한줄만으로 배포해 봅시다. 하는 방법은 매우 간단합니다.
+
+```ruby
+  desc "Deploy newTarget"
+  lane :newTarget do
+    match(type: 'appstore', readonly: true)
+    gym(scheme: 'newTarget', clean: true) // 여기에 아까 만들었던 scheme의 이름을 넣어줍시다. 그러면 gym이 알아서 빌드합니다.
+    pilot()
+  end
+```
+
+<br />
+
+## Android
+
+iOS가 target으로 패키징을 바꾸는 기능을 지원한다면 안드로이드는 flavor 라는 기능을 사용해서 앱의 패키지를 바꿀 수 있습니다. 다행인 것은 iOS보다 조금 덜 귀찮습니다. vscode의 수정만으로 가능합니다.
+
+### Gradle Flavor
+
+안드로이드에서는 빌드를 위해 gradle이라는 빌드 툴을 사용합니다. 코드 수정은 IDE인 안드로이드 스튜디오에서 도맡아 하고 테스트와 컴파일, 빌드와 같은 일들은 gradle이 책임집니다.
+
+gradle은 예전 빌드 시스템인 maven이나 ant보다 직관적이고 멋진 기능들을 제공합니다. 우리가 브랜디드 앱을 위해 사용할 gradle의 기능은 빌드 변형 구성, flavor 입니다. 단어에서 유추할 수 있듯이 동일한 코드를 다른 ‘맛'으로 빌드할 수 있게 해줍니다. flavor는 패키징의 교체 뿐만 아니라 개발 환경 분리, 유료 / 무료 앱 빌드 등 다양한 방면에서 활용될 수 있습니다.
+
+flavor를 생성하기 위해서는 build.gradle에서 product flavor를 선언해 주면 됩니다. 예시 코드를 통해 봅시다.
+
+```gradle
+    flavorDimensions "brand"
+
+    productFlavors {
+      brandedApp {
+        dimension 'brand'
+        applicationId 'co.brandedApp.debug'
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode project.hasProperty('versionCode') ? project.property('versionCode') as int : 1
+        versionName "1.0.0"
+        resValue "string", "appName", "brandedApp"
+        signingConfig signingConfigs.brandedApp
+      }
+    }
+
+    sourceSets {
+      brandedApp {
+        res.srcDir 'src/PUBL/devRes'
+      }
+    }
+```
+
+일단 gradle 빌드 설정에서 사용되는 몇가지 개념들을 알아보도록 합시다.
+
+### Signing config
+
+안드로이드 기기에는 서명된 앱들만 설치 될 수 있습니다. gradle의 signing config는 서명시 설정을 다룹니다.
+
+### BuildTypes
+
+말 그대로 타입별 앱 빌드 시 어떻게 빌드할 것인지에 대한 설정을 담당합니다. 빌드 설정은 기본적으로 debug와 Release 두가지 설정을 제공합니다. xcode의 build configuration에 해당합니다.
+
+### FlavorDimensions
+
+gradle의 flavor는 다차원으로 정의 될 수 있습니다. 이렇게 말하면 어려워 보이는데, flavor들을 정리할 수 있는 방법입니다. 예를 들면 subscription dimention에 free, paid flavor가 존재할 수 있습니다.
+
+### ProductFlavors
+
+flavor를 설정합니다. 해당 앱의 아이디와 이름, 인증 방법, Sdk 버전 등을 커스텀해서 앱의 패키징을 할 수 있습니다. 자세한 설명은 공식 문서를 참조하시길 바랍니다.
+
+### SourceSet
+
+각 flavor가 어떤 에셋을 사용할 것인지 경로를 직접 지정해 줍니다. flavor들의 에셋은 이런 식으로 넣어줄 수 있습니다.
+
+flavor와 사용할 에셋을 지정한다면 gradle이 빌드 시 해당 flavor의 에셋들을 main에 머지합니다. 다시 말해서 flavor의 세팅이 main의 세팅을 override 하게 됩니다.
+
+<br />
+
+<Image
+  alt={'folder structure'}
+  layout={'intrinsic'}
+  width={283}
+  height={445}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676609892/multiple-react-native-apps-with-one-codebase-android/1_5sWEE1qKbLKOOZvogVJ6Gg_rxmv9z.webp"
+/>
+
+<br />
+
+### Keystore
+
+안드로이드 앱들은 구글 플레이 콘솔에 올리기 전에 키 스토어를 통해 코드 사이닝 과정을 마쳐야 합니다. 키 스토어는 인증키가 들어 있는 파일입니다. 하나의 코드 베이스로 여러 앱을 만들때 인증 과정에 있어서 두가지 방법이 있습니다. 한가지 키 스토어를 사용해서 모든 앱을 사인하는 방법과 각 앱마다 키 스토어를 만들어서 각각 사인하는 방법이 있습니다.
+
+키스토어는 키와 밸류 형태로 여러 키들을 관리하는 거대한 파일이 될 수 있습니다. 따라서 한가지 키스토어로 여러 앱들을 관리하고 싶을 경우, alias로 키들을 관리하는 방법도 있습니다. 이 글에서는 한가지 키스토어를 사용하도록 하겠습니다.
+
+키 스토어를 생성하는 방법은 간단합니다.
+
+```text
+keytool -genkeypair -v -storetype PKCS12 -keystore my-upload-key.keystore -alias my-key-alias -keyalg RSA -keysize 2048 -validity 10000
+```
+
+해당 스크립트를 실행하면 my-upload-key.keystore 라는 이름의 키스토어가 생성되게 됩니다.
+
+### Fastlane & Service account
+
+앱들을 빌드할때마다 손으로 구글 플레이 콘솔에 업로드 하는 것은 귀찮은 일입니다. 따라서 터미널에 단 한줄만으로 빌드와 구글 플레이 콘솔에 업로드 할 수 있도록 fastlane을 사용하는 것이 권장됩니다. fastlane은 구글 플레이 콘솔에 업로드 하기 위해 api를 사용할 서비스 계정을 요구합니다.
+
+<br />
+
+<Image
+  alt={'google play api'}
+  layout={'intrinsic'}
+  width={1203}
+  height={970}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676610342/multiple-react-native-apps-with-one-codebase-android/1_oBkfOG7vVGrQthIWhIjQ3g_eugnyc.webp"
+/>
+
+<br />
+
+서비스 계정을 만드는 법은 위 그림, 혹은 이곳을 참조해 주세요. 서비스 계정 또한 한가지 계정이 모든 앱의 권한을 가질 수 있고, 각 앱마다 서비스 계정을 만들 수 있습니다.
+
+### Implementation
+
+```gradle
+signingConfigs {
+  debug {
+    storeFile file('debug.keystore')
+    storePassword 'android'
+    keyAlias 'androiddebugkey'
+    keyPassword 'android'
+}
+brandedApp {
+  if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+    storeFile file(MYAPP_UPLOAD_STORE_FILE)
+    storePassword MYAPP_UPLOAD_STORE_PASSWORD
+    keyAlias MYAPP_UPLOAD_KEY_ALIAS
+    keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+  }
+}
+
+flavorDimensions "brand"
+productFlavors {
+  brandedApp {
+    dimension 'brand'
+    applicationId 'co.brandedApp.debug'
+    minSdkVersion rootProject.ext.minSdkVersion
+    targetSdkVersion rootProject.ext.targetSdkVersion
+    versionCode project.hasProperty('versionCode') ?
+    project.property('versionCode') as int : 1
+    versionName "1.0.0"
+    resValue "string", "appName", "brandedApp"
+    signingConfig signingConfigs.brandedApp
+  }
+}
+sourceSets {
+  brandedApp {
+  res.srcDir 'src/PUBL/devRes'
+  }
+}
+```
+
+다시 돌아와서 위에 적은 소스 코드를 보도록 합시다. signingConfigs에 flavor의 이름에 따라 새로 만든 키스토어와 비밀번호를 추가해 주었습니다. 이제 gradle은 해당 이름의 flavor를 빌드할 때 마다 해당 인증을 사용하게 됩니다. 또한 sourceSets 에 들어 있는 에셋들을 자동적으로 사용하게 됩니다. 앱의 아이콘이나 스플래쉬들을요.
+
+이들을 바꾸는 법은 여러가지가 있지만, 가장 쉬운 방법은 이미 존재하는 main 폴더의 방식과 똑같이 만드는 것입니다. gradle은 변경사항을 머지하므로 바뀐 아이콘이 사용되게 됩니다.
+
+해당 flavor를 사용해 실행하거나, 빌드하려면 다음과 같은 명령어를 사용할 수 있습니다.
+
+```text
+# build flavor 'flavorName' only
+./gradlew bundleFlavorName
+```
+
+혹은 Fastlane을 사용해서 빌드할 수도 있습니다.
+
+```ruby
+gradle(task: "bundle", build_type: 'release', flavor: 'brandedApp', properties: {
+"versionCode" => bitrise_version_code,
+"android.injected.version.name" => newVersionName,
+})
+```
+
+간단하죠? 이렇게 해서 Android에서 target, flavor를 이용해서 브랜디드 앱을 만드는 방법을 알아보았습니다. 앱의 패키징을 바꾸고 자바스크립트를 이용해서 브랜디드 앱마다 특별한 경험을 줄 수 있다면, 빠르게 비즈니스에 특화된 앱들을 만들 수 있을 것입니다.
+
+<br />
+
+부족한 부분이나 틀린 부분이 있다면 댓글로 꼭 남겨주시길 바라겠습니다. 읽어주셔서 감사합니다.
