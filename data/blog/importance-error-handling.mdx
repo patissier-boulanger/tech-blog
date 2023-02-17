@@ -1,0 +1,96 @@
+---
+title: 몸으로 체험하는 에러 핸들링의 중요성
+date: '2022-10-03'
+tags: ['git']
+draft: false
+summary: 개발자로써 에러를 잘 다뤄야 한다는 사실은 누구나 잘 알고 있을 것입니다. 그러나 저는 부끄럽게도 이 사실을 애써 무시한 채로 살아왔습니다. 몸으로 수많은 고통을 체험하기 전까지는요. 이 글은 부끄러운 고백이자 에러 핸들링을 잘하자-라는 체험 수기입니다.
+images: []
+layout: PostSimple
+canonicalUrl:
+---
+
+세상에는 누구나 알고 있고, 누구나 실천해야 할 사실들이 많습니다. 예를 들어서 매일 스트레칭을 해야한다는 것, 주식은 우량주 위주로 넣으라는 것 등등요. 그러나 이들을 알고 있음에도, 인간은 같은 실수를 반복합니다. 몸으로 체험하기 전까지는요.
+
+개발자로써 에러를 잘 다뤄야 한다는 사실은 누구나 잘 알고 있을 것입니다. 그러나 저는 부끄럽게도 이 사실을 애써 무시한 채로 살아왔습니다. 몸으로 수많은 고통을 체험하기 전까지는요. 이 글은 부끄러운 고백이자 에러 핸들링을 잘하자-라는 체험 수기입니다.
+
+<br />
+
+지금까지 에러를 대하는 제 태도는 다음과 같았습니다.
+
+> 에러? try-catch만 잘 써서 콘솔에 찍으면 되지 뭐~ 콘솔에 다 찍히는거 아냐? 터지기야 하겠어?
+
+그리고 바로 이 안일한 마인드가 저에게 안구건조증과 하루 동안의 스트레스를 선사하게 되었습니다.
+
+문제는 다음과 같았습니다. 갑자기 CICD에서 하루 전만 해도 잘만 돌아가던 빌드가 실패하기 시작했습니다.
+
+저는 React Native를 회사에서 다루고 있습니다. 그리고 React Native의 빌드가 실패되는 경우와 이유는 헤르메스 엔진 설치에 실패한다던지, 애플 api가 오류를 뱉는다던지 굉장히 많았으므로, 별 생각 없이 로그를 열어 보았습니다.
+
+에러는 빌드 과정에서 발생했습니다.
+
+<Image
+  alt={'CICD errors'}
+  layout={'intrinsic'}
+  width={973}
+  height={1245}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676602477/importance-error-handling/1_WLLcu_UJAcWJr8lnpTwhNw_pi9utb.webp"
+/>
+
+```text
+'error: File ../main.jsbundle does not exist. This must be a bug with React Native, please report it here: https://github.com/facebook/react-native/issues'
+```
+
+에러의 내용은 명백해 보였습니다. main.jsbundle 파일, 즉 React Native의 번들된 자바스크립트 파일이 없다는 것이였죠. iOS의 빌드 과정인 bundle react native codes & images에서 해당 파일이 없으니 오류가 나는 것임이 틀림없었습니다.
+
+그리고 다음에 한 일은 구글에 React Native build error main.jsbundle not found로 검색을 해 보는 것이었습니다. 다행스럽게도 수많은 검색 결과들을 찾을 수 있었죠.
+
+<br />
+
+<Image
+  alt={'Google search result'}
+  layout={'intrinsic'}
+  width={1087}
+  height={1143}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676602478/importance-error-handling/1_O8nW8WBBh7eEcQBhvOI1rw_xmq2md.webp"
+/>
+
+<br />
+
+그리고 저는 장장 하루 동안 나와 있는 거의 모든 해결책을 실험해 보았습니다. 결과는 모두 실패였습니다. 애꿎은 xcode를 저주하면서 node 버전을 바꿔 보고, xcode 세팅을 바꿔보고 열심히 빌드를 돌렸죠. 효과는 없었습니다.
+
+그렇게 모니터를 보면서 외않되?-를 연발하다가 정신을 다잡았습니다.
+
+깃헙과 스택 오버플로우에 나온 답변들은 이미 React Native 버전이 0.65 이상으로 올라오면서 대부분 해결된 문제였습니다. 그들이 겪은 문제와 저의 문제는 로그 내용은 같아도 원인이 틀린 것이 분명했습니다.
+
+몇 일 전까지만 해도 빌드에 문제가 없었다는 것은 곧 main.jsbundle이 정상적으로 생성되었다는 것입니다. 그런데 로그는 이것이 없다고 하고 있네요. 그렇다면 테스트 해 볼 것은 main.jsbundle 파일이 정상적으로 생성되는지 매뉴얼로 만들어 보는 것입니다.
+
+자주 쓰지는 않지만 react-native bundle 명령어로 해당 파일을 만들어 볼 수 있습니다. 그리고 로컬에서 돌렸더니, 정상적으로 빌드가 되는 것을 확인했습니다. 그렇다면?
+
+CICD 인스턴스에서 같은 명령어를 실행해 보았더니, 이럴 수가. 번들링 과정에서 자바스크립트 에러가 나고 있었습니다.
+
+알고 보니 문제의 원인은 간단했습니다. 빌드 과정 전에 i18n으로 다국어 관련 설정을 받는 커맨드가 있었는데, 해당 커맨드가 업데이트 되면서 오류를 뿜어낸 것이었습니다. 즉, 해당 번들링 자체가 되지 않았으니 main.jsbundle 파일이 없던 것이었죠.
+
+처리되지 않은 에러가 빌드 단계로 넘어갔고, 여기서 main.jsbundle이 없다고 난리가 난 것입니다. 그리고 저는 해당 로그를 보면서 이딴 생각이나 하고 있었죠. xcode가 이 파일 위치를 못잡나?
+
+<br />
+
+이렇게 허무하게 문제를 해결했습니다. 꼬박 하루의 시간을 쏟았죠. 수많은 인공눈물을 눈에 넣은 것은 덤입니다.
+
+만약에 i18n 커맨드 시에 에러를 잡아서 로그를 잘 찍었다면 어떻게 되었을까요? 빌드로 넘어가기도 전에 해당 커맨드에서 에러가 났을 것이고, 혹은 에러가 났지만 정상적으로 넘어갔더라도 로그가 남아 있어 이것을 보고 쉽게 해결할 수 있었을 것입니다.
+
+<br />
+
+<Image
+  alt={'Google search result'}
+  layout={'intrinsic'}
+  width={600}
+  height={496}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676603999/importance-error-handling/one-problem-solved-5af304_c8iybh.jpg"
+/>
+
+<br />
+
+이렇게 해서 저는 에러를 해결할 수 있었습니다. 해결 과정에서 얻은 교훈은 이렇습니다. 에러 핸들링을 ‘잘’
+하자.
+
+항상 그렇듯 평소 소홀히 지나치는 것들이 큰 문제를 야기하는 것 같습니다. 여러분은 에러, 테스트를
+꼼꼼히 하시길 바라며 부끄러운 수기를 마치도록 하겠습니다.
