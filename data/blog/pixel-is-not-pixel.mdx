@@ -1,0 +1,287 @@
+---
+title: 픽셀이라고 다 같은 픽셀이 아닙니다
+date: '2023-02-03'
+tags: ['CICD', 'BITRISE']
+draft: false
+summary: 현재 우리가 살고 있는 디지털 세상은 바벨탑이 무너지고 난 이후의 세상과 같습니다. 수많은 해상도와 크기를 가진 그래픽 디바이스가 있고, 이들은 제각각 px, rem, dp, point 와 같은 수많은 단위들을 사용합니다. 혼잡하고 헷갈립니다. 이 글은 이렇게 헷갈리는 단위들을 조금이라도 쉽게 이해하고자 작성되었습니다. 디지털 세상에서 가장 기본적인 단위인 pixel을 이해하고, 이것이 어떻게 나뉘게 되었는지 이해한다면 단위들이 좀 더 쉽게 다가올지도 모릅니다.
+images: []
+layout: PostSimple
+canonicalUrl:
+---
+
+### 하나의 단위
+
+<br />
+
+<Image
+  alt={'babel tower'}
+  layout={'intrinsic'}
+  width={720}
+  height={480}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676619842/pixel-is-not-pixel/1_Ok19iP5aFCdM2BcPDd3haQ_owkn8d.webp"
+/>
+
+<br />
+
+바벨탑 이야기를 들어보신 적이 있으실 겁니다. 인간이 신에 대한 도전으로 높은 탑을 만들려 했고, 이에 분노한 신이 탑을 부수고 언어를 나누어 인간들이 뿔뿔히 흩어지게 했다는 그런 이야기입니다.
+
+혹자는 이 이야기에서 다른 교훈을 얻었겠지만 제가 생각하는 바벨탑 이야기의 진짜 교훈은 통일된 단위의 중요성입니다. 하나의 언어라는 가장 강력한 단위를 가지고 있으니 하늘까지 도달할 탑을 만들 수 있었던 것이죠.
+
+현재 우리가 살고 있는 디지털 세상은 바벨탑이 무너지고 난 이후의 세상과 같습니다. 수많은 해상도와 크기를 가진 그래픽 디바이스가 있고, 이들은 제각각 px, rem, dp, point 와 같은 수많은 단위들을 사용합니다. 혼잡하고 헷갈립니다.
+
+이 글은 이렇게 헷갈리는 단위들을 조금이라도 쉽게 이해하고자 작성되었습니다. 디지털 세상에서 가장 기본적인 단위인 pixel을 이해하고, 이것이 어떻게 나뉘게 되었는지 이해한다면 단위들이 좀 더 쉽게 다가올지도 모릅니다.
+
+그럼 들어가 볼까요?
+
+<br />
+
+### Pixel
+
+<br />
+
+<Image
+  alt={'babel tower'}
+  layout={'intrinsic'}
+  width={720}
+  height={443}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676619843/pixel-is-not-pixel/1_XlWO5hRocIkzSSjMD-Daww_bemi9b.webp"
+/>
+
+<br />
+
+각 단위들을 알아보기 이전에 가장 기본적인 단위를 이해해야 합니다. 디지털 세상에서 기본 단위는 픽셀입니다. Picture element 라고 불리는 픽셀은 그래픽 디스플레이에서 가장 작은 단위입니다. 앞으로 우리가 말할 단위 중에서 가장 기본이 되는 단위라고 할 수 있습니다.
+
+각각의 픽셀은 빨강, 파랑, 초록으로 이루어져 있고 조합을 통해 우리가 지금 모니터를 보는 것처럼 다양한 색깔을 나타냅니다. 픽셀들은 특정한 숫자를 가지고 있고 이 숫자가 컴퓨터로 하여금 어떤 색깔이 되어야 할 지를 말해줍니다.
+
+여러분들은 지금 픽셀을 보고 있습니다. 모니터가 픽셀들로 이루어진 그래픽 디바이스 이니까요. 1920 x 1080의 해상도를 가지고 있는 컴퓨터라면 이 모니터는 합해서 210만 개의 픽셀을 가지고 있습니다.
+
+<br />
+
+### 레티나 디스플레이 이전의 세상
+
+디지털 세상은 평화로웠습니다. 애플이 레티나 디스플레이를 발매하기 이전가지는요. 하나의 픽셀은 실제로 하나의 픽셀을 뜻했습니다. 가로와 세로가 100px은 사각형은 어느 디바이스, 어느 모니터에서나 같은 크기였습니다. 1000개의 실제 픽셀로 이루어져 있었으니까요. 개발자와 디자이너는 정말 행복했을 겁니다.
+
+그러던 어느 날 애플이 새로운 디스플레이를 출시하게 됩니다. 아이폰 4를 공개하면서 고밀도 디스플레이를 만들었는데 이를 레티나(망막) 디스플레이라고 이름을 붙인 거죠.
+
+<br />
+
+<Image
+  alt={'babel tower'}
+  layout={'intrinsic'}
+  width={650}
+  height={506}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676619844/pixel-is-not-pixel/1_EmUBDKZw3oAB8c1ncXSDXQ_qdwxvf.webp"
+/>
+
+<br />
+
+레티나 디스플레이는 놀라웠습니다. 정말로 선명한 화면을 체감할 수 있었죠. 아이폰 4의 해상도는 640 x 960으로 아이폰 3의 해상도 320 x 480 보다 2배나 높아졌습니다. 한마디로 픽셀의 개수가 2배나 많았습니다.
+
+그런데 둘의 크기는 해상도의 차이에도 불구하고 비슷했습니다.
+
+같은 크기인데 픽셀을 2배로 넣어야 한다면 어떻게 해야 할까요? 더 빽빽하게 넣으면 됩니다. 아이폰 3의 1인치당 픽셀 수-PPI는 163이었던 반면, 아이폰 4의 PPI는 326개입니다. 만약 아이폰 3에서 100 x 100 픽셀의 사각형을 그렸다면, 동일한 사각형은 아이폰 4에서 2배로 작게 보일 것입니다. 픽셀 수가 2배 더 많으니까요!
+
+그렇다면 아이폰 3과 4에서 동일한 크기의 사각형을 그리려면 어떻게 해야 했을까요? 가장 간단한 방법은 이러했을 것입니다.
+
+```text
+#box {
+  @if iphone3 {
+    width: 100px;
+    height: 100px;
+  } @else if iphone4 {
+    width: 200px;
+    height: 200px;
+  }
+}
+// 여기서 pixel은 실제 픽셀 개수로 생각해 주세요.
+```
+
+아이폰 3일 경우 100px, 4일 경우 2배의 픽셀을 가지고 있으므로 200px이라고 하면 됩니다. 그러나 아이폰 12의 경우 2532 x 1170 해상도에 PPI가 460입니다.
+
+각각의 기기에 맞춰서 픽셀을 제어하는 것은 불가능합니다. iOS는 기기가 별로 없으니 가능할지 몰라도 , 안드로이드의 경우 시중에 나와 있는 기기만 해도 수천 종입니다.
+
+이렇게 기기의 종류가 많아지고 픽셀 수 의 차이가 커지게 되면서 단위의 기준을 실제 픽셀 개수로 할 수 없게 되었습니다.
+
+**하드웨어 픽셀과 소프트웨어 픽셀(논리적 픽셀)이 분리되기 시작한 순간입니다.**
+
+각각의 제조사들(제조사는 아니지만 CSS, Apple, Samsung, Nokia 등등) 이 하나의 소프트웨어 픽셀에 얼마나 많은 하드웨어 픽셀이 들어갈지 유동적으로 결정하고, 이를 토대로 개발을 하기 시작한 것입니다.
+
+<br />
+
+### 소프트웨어 픽셀
+
+대표적인 소프트웨어 픽셀의 단위는 다음과 같습니다.
+
+<br />
+
+<Image
+  alt={'babel tower'}
+  layout={'intrinsic'}
+  width={720}
+  height={380}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676619844/pixel-is-not-pixel/1_JMsoVehT2WNs8BUORRcckg_xrfmrn.webp"
+/>
+
+<br />
+
+http://www.gregoryschmidt.ca/writing/when-is-a-pixel-not-a-pixel-pixels-points-dps
+
+<br />
+
+### CSS px
+
+Web에서의 CSS px부터 설명을 시작해보도록 하겠습니다. 위에서의 예시는 아이폰을 예시로 들었지만 브라우저에서도 상황은 같습니다. 모바일로 브라우저를 보아야 할 때도 있고 모니터의 크기와 모니터가 가진 하드웨어 픽셀들의 개수도 다양해졌습니다.
+
+w3c에서는 Reference pixel을 모든 픽셀 기반의 단위의 기준으로 삼았습니다. Reference pixel은 고정된 하드웨어 픽셀과 달리 같이 다양한 상황을 고려해서 만들어졌습니다. 1 Reference pixel의 기준은 이렇습니다. 96 DPI의 그래픽 디바이스를 71cm 거리에서 볼 경우 1개의 하드웨어 픽셀이 바로 1 Reference pixel입니다.
+
+<br />
+
+<Image
+  alt={'css pixel'}
+  layout={'intrinsic'}
+  width={412}
+  height={321}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676619845/pixel-is-not-pixel/1_ifTVEQCWY3qdHm4TXizdqA_f5dtre.webp"
+/>
+
+<br />
+
+쉽게 말해서 일반적인 해상도의 디바이스를 팔 길이 만큼 떨어져서 보았을때 한개의 하드웨어 픽셀이 바로 1 Reference pixel = 1 CSS pixel인 것입니다. 1 Reference pixel의 값은 고정되어 있는 값이 아닙니다. 위의 그림과 같이 눈과 디바이스와의 거리가 멀 경우 크기를 보정하고, 해상도가 높은 경우 하나의 CSS pixel에 여러개의 하드웨어 픽셀을 넣는 식으로 보정합니다.
+
+**결국 1 CSS pixel은 거리와 해상도에 따라 다양한 디바이스에서 비슷한 크기를 보장하기 위해 만들어진 단위입니다.**
+
+접근성 면에서나 반응형 레이아웃에서 CSS pixel을 쓰면 안되는 이유가 바로 이것입니다. 접근성 면을 생각해 봅시다. 12 css pixel의 글씨는 어느 기기에서도 비슷한 크기로 보입니다. 눈이 좋지 않은 사람이 브라우저나 모바일 폰트 크기를 키워도 값이 바뀌지 않을 겁니다. 레이아웃의 경우도 비율에 따라 바뀌는 것이 아니라 항상 비슷한 값을 보여줄 것입니다.
+
+https://www.w3.org/TR/CSS2/syndata.html#length-units 에서 더 자세한 설명을 확인할 수 있습니다.
+
+<br />
+
+### iOS point
+
+<br />
+
+<Image
+  alt={'apple point'}
+  layout={'intrinsic'}
+  width={705}
+  height={283}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676619847/pixel-is-not-pixel/1_x6zGy-aUrG6R4aXPDLnBIw_qeeg4c.webp"
+/>
+
+<br />
+
+문제의 근원 애플입니다. 애플에서 사용하는 논리적 픽셀 단위는 points입니다. 애플의 기종들은 3가지로 나눌 수 있습니다. 레티나 이전 디스플레이를 사용하는 아이폰 4 이전의 기종들과 레티나 디스플레이를 사용하는 아이폰 4와 5, 이후의 레티나 hd 디스플레이를 사용하는 기종들입니다.
+
+각 기종들에서 1 point는 다음과 같습니다. 163DPI의 아이폰 3을 기준으로 1 point는 1 하드웨어 픽셀입니다. 레티나 디스플레이에서 1point는 4 하드웨어 픽셀입니다. 레티나 hd 디스플레이에서는 9 하드웨어 픽셀입니다.
+
+가로와 세로가 100 point인 사각형을 생각해 봅시다. point는 논리적 단위이므로 모든 기종에서 크기는 거의 비슷하게 보입니다. 그러나 가지고 있는 픽셀 수는 2배, 3배 차이가 나게 됩니다.
+
+따라서 아이폰에서 이미지를 사용할때 1배, 2배, 3배 이미지를 사용하는 이유가 바로 이것입니다. 레티나 hd의 경우 같은 물리적 크기의 공간에서 3배의 픽셀을 사용하기 때문에 3배의 픽셀을 가지고 있는 이미지를 사용해야 고화질을 표현할 수 있기 때문입니다.
+
+https://www.paintcodeapp.com/news/ultimate-guide-to-iphone-resolutions에서 실제 point가 어떻게 변환되는지 기종별로 알아볼 수 있습니다.
+
+<br />
+
+### Android dp, dip, sp
+
+<br />
+
+<Image
+  alt={'apple point'}
+  layout={'intrinsic'}
+  width={720}
+  height={274}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676619848/pixel-is-not-pixel/1_lwm3Vt8qf35WD0pujOsGvA_vinhtg.webp"
+/>
+
+<br />
+
+안드로이드의 경우는 구분이 애플보다 복잡합니다. 제조사가 다양하고 이에 따라 기기의 종류 또한 매우 많기에 5단계로 해상도 구분을 합니다.
+
+우선 하단에 160 DPI 라고 적혀 있는 단위가 보이실 텐데, 주의할 점은 DPI와 DIP는 비슷해 보이지만 완전히 다른 개념이라는 것입니다. DPI는 PPI와 비슷하게 1인치당 얼마나 많은 하드웨어 픽셀이 들어가는지를 나타냅니다. 즉 MDPI 안드로이드 기기는 1인치당 하드웨어 픽셀이 160개가 들어갑니다.
+
+안드로이드에서 사용하는 논리적 픽셀 단위는 DP, DIP 입니다. Display independent pixel의 약자로써 말 그대로 디스플레이에 독립적인 픽셀입니다.
+
+<br />
+
+<Image
+  alt={'px dp calculation'}
+  layout={'intrinsic'}
+  width={720}
+  height={401}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676619846/pixel-is-not-pixel/1_M9Wc33297nlpf9uxgLPVLQ_d1xkjc.webp"
+/>
+
+<br />
+
+<center>https://0391kjy.tistory.com/43</center>
+
+mdpi인 안드로이드 핸드폰에서 1 하드웨어 픽셀은 1dp입니다. xxxhdpi인 핸드폰의 경우 1인치당 하드웨어 픽셀 수가 640개로 4배가 많습니다. 따라서 mdpi 핸드폰과 xxxhdpi 핸드폰에서 동일한 크기를 보장하기 위해 dp를 사용합니다. xxxhdpi에서 1dp는 4개의 하드웨어 픽셀을 포함합니다.
+
+만약 px로 작업된 안드로이드 시안이 넘어왔고 px(css px이 아닙니다)을 토대로 작업을 했다면 갤럭시 2에서 잘 보이는 시안이 갤럭시 8에서는 4배로 작게 보이는 마법같은 일을 경험할 수 있을 겁니다.
+
+안드로이드에서 텍스트의 경우 SP라는 단위를 사용하는데 이는 Scale-independent pixel이라고 불리며 핸드폰 폰트 기본설정에 따라 접근성의 이유로 배율이 조정됩니다. 그리고 iOS와 동일한 이유로 안드로이드에서도 이미지를 사용할 때 1x, 2x, 3x, 4x, 5x까지 다양한 배율의 이미지를 사용해야 본래 의도했던 효과를 얻을 수 있습니다.
+
+<br />
+
+### Cross platform unit
+
+크로스 플랫폼을 만들기 위해 사용하는 가장 유명한 두 가지 라이브러리인 flutter와 React Native의 경우도 안드로이드와 비슷한 단위를 사용합니다. flutter의 설명에 보면 이렇게 쓰여져 있습니다.
+
+> Flutter doesn’t have dps but there are logical pixels, which are basically the same as device-independent pixels.
+
+구글에서 만든 언어인데 왜 안드로이드 단위인 dp를 사용하지 않는다는 건지 잘 모르겠지만 어쨌든 LP라 불리는 dip와 같은 논리적 단위를 사용하는 것을 알 수 있습니다. 둘의 차이는 없습니다.
+
+React Native 또한 dp를 사용합니다. 그러나 안드로이드에서 사용하는 dp는 아니고 코드로 입력된 dp를 각 플랫폼별로 환산합니다. RN dp → ios Point, android dp 가 되는 방식입니다.
+
+<br />
+
+### 소프트웨어 픽셀은 만능이 아니다
+
+이렇게 각 플랫폼에서 논리적 픽셀들을 알아보았습니다. 논리적 픽셀을 통해 해상도가 다른 디바이스들을 일일히 고려하지 않고 대응할 수 있게 되었습니다. 정말 편하군요. 다만 같은 PPI, 같은 해상도인 기기인데 물리적 사이즈가 다르다면 어떻게 해야 할까요?
+
+<br />
+
+<Image
+  alt={'px dp calculation'}
+  layout={'intrinsic'}
+  width={650}
+  height={363}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676619849/pixel-is-not-pixel/1_S4ZMJ4wqJ0d4hXmIFHXOmg_cv7tvy.webp"
+/>
+
+<br />
+
+논리적 픽셀은 다른 해상도를 가진 기기들 사이에서 같은 크기를 보장하는 것이 목적입니다. 그 말은 곧 비율에 따라 다른 크기를 보여줘야 하는 상황에서는 쓸 수 없다는 말과 같습니다. 핸드폰에서 200dp 인 박스는 패드에서도 200dp의 사이즈로 보일 것입니다. 사용자가 느끼기에는 어떨까요?
+
+<br />
+
+<Image
+  alt={'px dp calculation'}
+  layout={'intrinsic'}
+  width={650}
+  height={475}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1676619848/pixel-is-not-pixel/1_3vOgVg8xBktJ2_OQlYPqrg_rti9yy.webp"
+/>
+
+<br />
+
+<center>https://yaobin.me/blog/react-native-support-multiple-screen-sizes</center>
+
+만약 이러한 부분을 고려하지 않고 dp로만 레이아웃을 구성했다고 생각해 봅시다. 결과는 위와 같은 일이 벌어질 것입니다. 따라서 다양한 기기와 플랫폼에 대응하기 위해서는 고정 영역과 동적 영역을 나눠서 구성한다던지, 퍼센트와 같은 상대적 단위를 사용해야 합니다. 아까 CSS pixel을 반응형에서 사용할 수 없는 이유를 떠올려 보세요!
+
+<br />
+
+### 정리
+
+기술의 발전으로 더 좋은 해상도의 디바이스들이 나오면서 기존의 사용하던 하드웨어 픽셀로 단위를 사용하기 어려워 졌습니다. 이를 해결하기 위해 나온 단위가 소프트웨어 픽셀-논리적 픽셀이며 pixel, point, dp와 같은 단위들이 있습니다.
+
+각각의 스펙과 정의는 조금 다를 지 몰라도 이들의 원하는 것은 같습니다. 어떤 기기에서든 거의 비슷한 크기를 보여주는 것입니다.
+
+<br />
+
+### 마치며
+
+다시 처음의 이야기로 돌아가 봅시다. 바벨탑이 무너지면서 인류는 서로 다른 언어를 사용하기 시작했습니다. 처음에는 불편한 점이 많았을 것입니다. 다만 언어의 분화가, 불편함이 결국에는 더 다양하고 멋진 문화들을 꽃피우게 되었습니다.
+
+다른 플랫폼, 여러가지 디바이스, 그래픽 기술이 발전하면서 우리는 여러 가지 단위를 학습해야 하게 되었습니다. 분명 귀찮고 불편한 일일 수 있지만 이를 통해 우리는 결국 좀 더 선명한 이미지, 선명한 동영상을 즐길 수 있습니다. 불편함이 꼭 나쁜 것만은 아니라는 생각이 듭니다. 그걸 뛰어넘는 것은 우리의 몫이지만요.
