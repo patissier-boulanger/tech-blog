@@ -21,22 +21,20 @@ const LayoutWrapper = ({ children }: Props) => {
     <SectionContainer>
       <div className="flex h-screen flex-col justify-between">
         <header className="flex flex-col justify-between py-10 sm:flex-row sm:items-center">
-          <div>
+          <div className="flex flex-row items-start justify-between">
             <Link href="/" aria-label={siteMetadata.headerTitle}>
-              <div className="flex flex-row items-start justify-between">
-                <div>
-                  <div className="mr-3 font-serif text-base font-bold text-gray-800 dark:text-gray-100">
-                    정주형의 블로그
-                  </div>
-                  <div className="font-serif italic text-gray-500 dark:text-gray-400">
-                    Write Dev Articles
-                  </div>
+              <div>
+                <div className="mr-3 font-serif text-base font-bold text-gray-800 dark:text-gray-100">
+                  정주형의 블로그
                 </div>
-                <div className="self-center sm:hidden">
-                  <ThemeSwitch />
+                <div className="font-serif italic text-gray-500 dark:text-gray-400">
+                  Write Dev Articles
                 </div>
               </div>
             </Link>
+            <div className="self-center sm:hidden">
+              <ThemeSwitch />
+            </div>
           </div>
           <div className="hidden items-center space-x-4 text-base leading-5 sm:flex sm:space-x-0">
             <a
