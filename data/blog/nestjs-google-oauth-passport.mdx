@@ -1,0 +1,275 @@
+---
+title: 올바르게 @nestjs/passport GoogleStrategy 구현하기
+date: '2024-03-28'
+tags: ['NestJS', 'passport', 'GoogleOauth']
+draft: false
+summary: 한 줄 요약. NestJS에서 passport를 사용해 Google Oauth를 구현할때 주의 사항이 있습니다. 바로 GoogleStrategy의 메소드인 validate에서 done 함수를 호출하지 말라는 것입니다.
+images: []
+layout: PostSimple
+canonicalUrl:
+---
+
+<br />
+
+<Image
+  alt={'nestjs/passport logo'}
+  layout={'intrinsic'}
+  width={720}
+  height={176}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1711623165/nestjs-oauth-google/vji9smd7rw4wtuepoqrs.webp"
+/>
+
+<br />
+
+### TL;DR
+
+요약하면 아주 간단한 글입니다. NestJS에서 passport를 사용해 Google Oauth를 구현할 경우, GoogleStrategy의 메소드인 validate에서 done 함수를 호출하지 마세요. 그냥 객체를 리턴하세요!
+
+NestJS를 사용해 구글 소셜 로그인을 구현한 많은 레퍼런스 글들을 보면 아래와 같이 GoogleStartegy를 구현해 놓은 것을 알 수 있습니다.
+
+<Image
+  alt={'some example on google startegy implementation'}
+  layout={'intrinsic'}
+  width={717}
+  height={837}
+  src="https://res.cloudinary.com/dcy3ccdem/image/upload/v1711623165/nestjs-oauth-google/ox0bleoi0uly6bilbdey.webp"
+/>
+
+validate 메소드 내부에서 마지막 인자로 받는 done 콜백함수를 호출하고 있죠. 그러나 @nestjs/passport 의 PassportStrategy 내부 구현을 보면 validate 함수는 done을 호출하면 안됩니다. PassportStrategy 클래스 내부에 정의된 callback에서 알아서 done을 호출하기 때문입니다.'
+
+<br />
+
+### MixinStrategy 코드 파헤쳐보기
+
+@nestjs/passport 의 PassportStrategy 함수입니다. 해당 함수는 Strategy (구글 로그인에서는 passport-google-oauth20)과 이름을 인자로 받아서 MixinStrategy 클래스를 리턴합니다. 따라서 우리가 만든 GoogleStrategy 클래스는 실제론 MixinStrategy 클래스의 자식이 됩니다.
+
+```ts
+import * as passport from 'passport'
+import { Type } from '../interfaces'
+
+export function PassportStrategy<T extends Type<any> = any>(
+  Strategy: T,
+  name?: string | undefined,
+  callbackArity?: true | number
+): {
+  new (...args): InstanceType<T>
+} {
+  abstract class MixinStrategy extends Strategy {
+    abstract validate(...args: any[]): any
+
+    constructor(...args: any[]) {
+      const callback = async (...params: any[]) => {
+        const done = params[params.length - 1]
+        try {
+          const validateResult = await this.validate(...params)
+          if (Array.isArray(validateResult)) {
+            done(null, ...validateResult)
+          } else {
+            done(null, validateResult)
+          }
+        } catch (err) {
+          done(err, null)
+        }
+      }
+
+      if (callbackArity !== undefined) {
+        const validate = new.target?.prototype?.validate
+        const arity = callbackArity === true ? validate.length + 1 : callbackArity
+        if (validate) {
+          Object.defineProperty(callback, 'length', {
+            value: arity,
+          })
+        }
+      }
+      super(...args, callback)
+
+      const passportInstance = this.getPassportInstance()
+      if (name) {
+        passportInstance.use(name, this as any)
+      } else {
+        passportInstance.use(this as any)
+      }
+    }
+
+    getPassportInstance() {
+      return passport
+    }
+  }
+  return MixinStrategy
+}
+```
+
+https://github.com/nestjs/passport/blob/master/lib/passport/passport.strategy.ts?source=post_page-----2780a02a25f8--------------------------------
+
+12번째 줄을 보도록 합시다. abstract validate라는 메서드가 보입니다. 자바스크립트에서 보니 조금 어색한 키워드인 abstact는 타입스크립트에서 지원하는 추상 메서드 기능입니다.
+
+해당 기능을 간단히 설명하면 추상 메서드를 선언한 클래스의 자식들은 꼭 추상 메서드를 구현해야 합니다. 예를 들면 MixinStrategy 자식인 GoogleStartegy는 validate 메서드를 구현해야 합니다.
+
+```ts
+abstract class MixinStrategy extends Strategy {
+  abstract validate(...args: any[]): any
+}
+```
+
+따라서 부모인 MixinStrategy에서 validate 메서드를 호출하면 자식인 GoogleStartegy의 validate 함수가 호출됩니다.
+
+조금 더 코드를 볼까요? 생성자 내부에서 callback 함수를 정의하고 있습니다.
+
+```ts
+abstract validate(...args: any[]): any;
+
+    constructor(...args: any[]) {
+      const callback = async (...params: any[]) => {
+        const done = params[params.length - 1];
+        try {
+          const validateResult = await this.validate(...params);
+          if (Array.isArray(validateResult)) {
+            done(null, ...validateResult);
+          } else {
+            done(null, validateResult);
+          }
+        } catch (err) {
+          done(err, null);
+        }
+      };
+```
+
+해당 함수에서는 받은 인자들을 사용해서 validate를 호출하고 있습니다. 그런데 단순히 return validate()하는 것이 아니라, 해당 메서드의 결과값을 callback함수의 마지막 인자인 done을 사용해서 호출하고 있습니다.
+
+그렇다면 이 done은 어디서 오는 친구일까요? 바로 @nestjs/passport 가 wrapping하고 있는 passport-google-oauth20에서 넣어 주는 인자입니다.
+
+```ts
+super(...args, callback)
+```
+
+코드를 보면 MixinStrategy 클래스는 부모 클래스인 Startegy(passport-google-oauth20)의 생성자 함수를 호출하고 있습니다. 가장 처음의 만든 GoogleStartegy가 super를 통해서 건네준 args와, 해당 MixinStrategy 클래스에서 만든 callback 함수를 다시 부모에게 건네주고 있는 것이죠.
+
+따라서 callback 함수는 passport-google-oauth20의 GoogleStrategy의 두번째 인자인 verify 함수가 됩니다. callback 함수에서 받는 인자들은 결국 GoogleStartegy 클래스(passport-google-oauth20)의 인자인 accessToken, refreshToken, profile, cb 입니다. 즉 done은 verify 함수의 cb인 것입니다.
+
+```ts
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env['GOOGLE_CLIENT_ID'],
+      clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
+      callbackURL: 'https://www.example.com/oauth2/redirect/google',
+      scope: ['profile'],
+      state: true,
+    },
+    function verify(accessToken, refreshToken, profile, cb) {
+      db.get(
+        'SELECT * FROM federated_credentials WHERE provider = ? AND subject = ?',
+        ['https://accounts.google.com', profile.id],
+        function (err, cred) {
+          if (err) {
+            return cb(err)
+          }
+
+          if (!cred) {
+            // The account at Google has not logged in to this app before.  Create a
+            // new user record and associate it with the Google account.
+            db.run('INSERT INTO users (name) VALUES (?)', [profile.displayName], function (err) {
+              if (err) {
+                return cb(err)
+              }
+
+              var id = this.lastID
+              db.run(
+                'INSERT INTO federated_credentials (user_id, provider, subject) VALUES (?, ?, ?)',
+                [id, 'https://accounts.google.com', profile.id],
+                function (err) {
+                  if (err) {
+                    return cb(err)
+                  }
+
+                  var user = {
+                    id: id,
+                    name: profile.displayName,
+                  }
+                  return cb(null, user)
+                }
+              )
+            })
+          } else {
+            // The account at Google has previously logged in to the app.  Get the
+            // user record associated with the Google account and log the user in.
+            db.get('SELECT * FROM users WHERE id = ?', [cred.user_id], function (err, user) {
+              if (err) {
+                return cb(err)
+              }
+              if (!user) {
+                return cb(null, false)
+              }
+              return cb(null, user)
+            })
+          }
+        }
+      )
+    }
+  )
+)
+```
+
+https://github.com/jaredhanson/passport-google-oauth2
+
+다시 돌아가서 MixinStartegy callback 함수를 봅시다.
+
+```ts
+const callback = async (...params: any[]) => {
+  const done = params[params.length - 1]
+  try {
+    const validateResult = await this.validate(...params)
+    if (Array.isArray(validateResult)) {
+      done(null, ...validateResult)
+    } else {
+      done(null, validateResult)
+    }
+  } catch (err) {
+    done(err, null)
+  }
+}
+```
+
+done 함수는 GoogleStartegy 클래스(passport-google-oauth20)의 마지막 인자 cb입니다. callback 함수는 우리가 만든 validate 함수를 실행해서 해당 결과를 cb에 넘겨 실행하고 있습니다.
+
+우리가 만든 validate 함수의 params 또한 GoogleStartegy 클래스(passport-google-oauth20)의 params과 같기는 하지만 어디까지나 cb를 호출하는 것은 MixinStartegy의 callback 영역입니다. 따라서 이것이 validate에서 done을 호출하면 안되는 이유입니다.
+
+사실 실제로 validate에서 done을 호출해도 작동하긴 합니다. 그러나 그것이 NestJS/passport 의 의도는 아닐 것이라고 생각합니다. 최대한 의도를 따라서 코딩하는 편이 더 안전하겠죠.
+
+```ts
+import { PassportStrategy } from '@nestjs/passport'
+import { Strategy } from 'passport-google-oauth20'
+
+export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
+  constructor() {
+    super({
+      clientID: process.env.GOOGLE_OAUTH_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_OAUTH_REDIRECT_URI,
+      scope: ['email', 'profile', 'openid'],
+    })
+  }
+
+  async validate(accessToken: string, refreshToken: string, profile: any) {
+    try {
+      const { id, name, emails, photos } = profile
+
+      const user = {
+        id: id,
+        email: emails[0].value,
+        firstName: name.familyName,
+        lastName: name.givenName,
+        photo: photos[0].value,
+      }
+
+      return user
+    } catch (error) {
+      return error
+    }
+  }
+}
+```
+
+그리고 더 간단하지 않나요?
+
+읽어주셔서 감사합니다. 혹시 틀린 점이 있다면 꼭 알려주세요!
