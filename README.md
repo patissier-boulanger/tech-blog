@@ -12,4 +12,4 @@
 </p>
 
 ## GitHub
-- [GitHub Profile](https://github.com/patissier-boulanger)
+[GitHub Profile](https://github.com/patissier-boulanger)
